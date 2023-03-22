@@ -2,25 +2,10 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import Cors from "cors";
 import { client } from "lib/redis";
 import { env } from "~/env.mjs";
-import { z } from "zod";
-import format from "date-fns/format";
-import { prisma } from "~/server/db";
+import { recallRepository } from "./test";
 
 
 client.on("error", (err) => console.log("Redis Client Error", err));
-
-// creating a schema for strings
-const addRecallSchema: z.Schema = z.object({
-  name: z.string(),
-  userId: z.string(),
-  userEmail: z.string().email(),
-  userImage: z.string(),
-  userName: z.string(),
-  last: z.date(),
-  next: z.date(),
-  calendar: z.array(z.date()),
-});
-export type AddRecall = z.infer<typeof addRecallSchema >
 
 type MiddlewareFnCallbackFn = (result: unknown) => unknown;
 type MiddlewareFn = (
@@ -61,36 +46,21 @@ export default async function handler(
 
   // Rest of the API logic
 
-  
-  if (req.headers.authorization !== env.API_AUTH_HEADERS_KEY_ADD_RECALL)
+  // TODO : change auth header
+  if (req.headers.authorization !== env.API_AUTH_HEADERS_KEY_TEST)
     return res
       .status(403)
       .json({ msg: "Your authorization header is not valid" });
-
-
-  // Validating recall body with zod
-  
-const 
-  // Creating recall plan in DB
- const newRecall = await prisma.memoDate.create({
-    data: {
-      name: "Test recall",
-      userId: "1234",
-      userEmail: "test@mail.com",
-      userImage: "http://cdn.Image.com",
-      userName: "Cmon",
-      last: Date(),
-      next: Date(),
-      calendar: [Date(), Date()],
-      
-    },
-  });
-
-  
   // Connecting to redis client
   await client.connect();
 
-  res.json({ msg: `Here's the data you saved ${newRecall}` });
+  const recall = await recallRepository
+    .search()
+    .where("userId")
+    .eq("req.body.userId")
+    .return.all();
+
+  res.json({ msg: "Hello there", recall });
 
   // Deconnecting from redis client
   await client.disconnect();

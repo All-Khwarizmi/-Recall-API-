@@ -19,7 +19,7 @@ const recallSchema = new Schema("recall", {
   calendar: { type: "string[]" },
 });
 
-const recallRepository = new Repository(recallSchema, client);
+export const recallRepository = new Repository(recallSchema, client);
 
 // creating a zod validation schema for recall incoming request
 const addRecallSchema = z.object({
@@ -72,7 +72,8 @@ export default async function handler<NextApiHandler>(
   // Creating recall plan in Redis DB
 try {
   await client.connect();
-
+  await recallRepository.createIndex()
+  
   const recall = await recallRepository.save(parsedRequestData.data);
   // const requestKey = req.body;
   // const authHeaders = req.headers;
@@ -89,7 +90,6 @@ try {
       error,
     });
 }
-
 
   // Deconnecting from redis client
   await client.disconnect();

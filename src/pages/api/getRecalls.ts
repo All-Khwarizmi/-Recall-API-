@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import Cors from "cors";
 import { client } from "lib/redis";
 import { env } from "~/env.mjs";
-
+import { recallRepository } from "./test";
 import format from "date-fns/format";
 import { prisma } from "~/server/db";
 
@@ -55,7 +55,9 @@ export default async function handler(
   // Connecting to redis client
   await client.connect();
 
-  res.json({ msg: "Hello there" });
+  const recall = await recallRepository.search().return.all();
+
+  res.json({ msg: "Hello there", recall });
 
   // Deconnecting from redis client
   await client.disconnect();
