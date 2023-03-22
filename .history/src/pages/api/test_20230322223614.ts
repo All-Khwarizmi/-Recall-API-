@@ -32,8 +32,8 @@ const addRecallSchema = z.object({
   nextRecall: z.date(),
   calendar: z.array(z.string()),
 });
-export type AddRecall = z.infer<typeof addRecallSchema>;
-export type DayDate = Date;
+export type AddRecall = z.infer<typeof addRecallSchema >
+export type DayDate = Date
 
 export default async function handler<NextApiHandler>(
   req: NextApiRequest,
@@ -58,38 +58,32 @@ export default async function handler<NextApiHandler>(
     calendar: req.body.calendar.map((item: string) => {
       console.log(item);
       console.log(Date.parse(item));
-      return item;
+      return  item;
     }),
   };
 
   const parsedRequestData = addRecallSchema.safeParse(requestData);
   if (!parsedRequestData.success)
-    return res.status(400).json({
-      msg: "Please be sure to fill the body of your request with valid data. Refer to API documentation.",
-    });
+    return res
+      .status(400)
+      .json({
+        msg: "Please be sure to fill the body of your request with valid data. Refer to API documentation.",
+      });
   console.log("parsedRequestData", parsedRequestData);
+
+  //
 
   // Creating recall plan in Redis DB
-try {
+
   await client.connect();
 
-  const recall = await recallRepository.save(parsedRequestData.data);
-  // const requestKey = req.body;
-  // const authHeaders = req.headers;
-  console.log("parsedRequestData", parsedRequestData);
-  console.log("recall", recall);
+  const requestKey = req.body;
+  const authHeaders = req.headers;
+  console.log("reqkey", requestKey);
+  console.log("authHeaders", authHeaders);
+  const setKey = await client.set(req.body.key, req.body.value);
 
-  res.status(200).json({ name: `Setting key status = ${recall}` });
-} catch (error) {
-  console.log(error);
-  res
-    .status(500)
-    .json({
-      msg: "We could not add the new recall plan. Please try again later or open an issue on Github",
-      error,
-    });
-}
-
+  res.status(200).json({ name: `Setting key status = ${setKey}` });
 
   // Deconnecting from redis client
   await client.disconnect();

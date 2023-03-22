@@ -24,9 +24,6 @@ const server = z.object({
   REDIS_URL: z.string(),
   API_AUTH_HEADERS_KEY_TEST: z.string(),
   API_AUTH_HEADERS_KEY_ADD_RECALL: z.string(),
-  REDIS_PWD: z.string(),
-  REDIS_HOST: z.string(),
-  REDIS_PORT: z.string(),
 });
 
 /**

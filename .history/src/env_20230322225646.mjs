@@ -24,9 +24,6 @@ const server = z.object({
   REDIS_URL: z.string(),
   API_AUTH_HEADERS_KEY_TEST: z.string(),
   API_AUTH_HEADERS_KEY_ADD_RECALL: z.string(),
-  REDIS_PWD: z.string(),
-  REDIS_HOST: z.string(),
-  REDIS_PORT: z.string(),
 });
 
 /**
@@ -53,9 +50,9 @@ const processEnv = {
   REDIS_URL: process.env.REDIS_URL,
   API_AUTH_HEADERS_KEY_TEST: process.env.API_AUTH_HEADERS_KEY_TEST,
   API_AUTH_HEADERS_KEY_ADD_RECALL: process.env.API_AUTH_HEADERS_KEY_ADD_RECALL,
-  REDIS_PWD: process.env.REDIS_PWD,
-  REDIS_HOST: process.env.REDIS_HOST,
-  REDIS_PORT: process.env.REDIS_PORT,
+  API_AUTH_HEADERS_KEY_ADD_RECALL: process.env.API_AUTH_HEADERS_KEY_ADD_RECALL,
+  API_AUTH_HEADERS_KEY_ADD_RECALL: process.env.API_AUTH_HEADERS_KEY_ADD_RECALL,
+  API_AUTH_HEADERS_KEY_ADD_RECALL: process.env.API_AUTH_HEADERS_KEY_ADD_RECALL,
   // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
 };
 

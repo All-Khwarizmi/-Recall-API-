@@ -70,26 +70,18 @@ export default async function handler<NextApiHandler>(
   console.log("parsedRequestData", parsedRequestData);
 
   // Creating recall plan in Redis DB
-try {
+
   await client.connect();
 
-  const recall = await recallRepository.save(parsedRequestData.data);
+  const recall = await recallRepository.save(parsedRequestData)
+
   // const requestKey = req.body;
   // const authHeaders = req.headers;
   console.log("parsedRequestData", parsedRequestData);
-  console.log("recall", recall);
+  console.log("recall", authHeaders);
+  const setKey = await client.set(req.body.key, req.body.value);
 
-  res.status(200).json({ name: `Setting key status = ${recall}` });
-} catch (error) {
-  console.log(error);
-  res
-    .status(500)
-    .json({
-      msg: "We could not add the new recall plan. Please try again later or open an issue on Github",
-      error,
-    });
-}
-
+  res.status(200).json({ name: `Setting key status = ${setKey}` });
 
   // Deconnecting from redis client
   await client.disconnect();

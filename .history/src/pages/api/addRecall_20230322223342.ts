@@ -9,7 +9,7 @@ import { addDays } from "date-fns";
 
 client.on("error", (err) => console.log("Redis Client Error", err));
 
-// creating a zod validation schema for recall incoming request
+// creating a zod schema for recall incoming request
 const addRecallSchema = z.object({
   name: z.string(),
   userId: z.string(),

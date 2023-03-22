@@ -9,7 +9,7 @@ import { addDays } from "date-fns";
 
 client.on("error", (err) => console.log("Redis Client Error", err));
 
-// creating a zod validation schema for recall incoming request
+// creating a schema for strings
 const addRecallSchema = z.object({
   name: z.string(),
   userId: z.string(),
@@ -91,12 +91,8 @@ console.log("parsedRequestData", parsedRequestData);
 
 // 
 
-// Creating recall plan in Redis DB 
-
-await client.connect()
-
-// Creating recall plan in DB postgres
-try {
+  // Creating recall plan in DB
+  try {
 
       const newRecall = await prisma.memoDate.create({
          data: requestData,
