@@ -7,6 +7,7 @@ import { z } from "zod";
 
 client.on("error", (err) => console.log("Redis Client Error", err));
 
+// Types
 type MiddlewareFnCallbackFn = (result: unknown) => unknown;
 type MiddlewareFn = (
   req: NextApiRequest,
@@ -36,10 +37,14 @@ function runMiddleware(
     });
   });
 }
-// Zod validation 
- const userRecallRequestSchema = z.object({
-  userId : z.string()
- })
+
+// Zod validation
+const deleteRecallRequestSchema = z.object({
+  userId: z.string(),
+  name: z.string(),
+  nextRecall: z.date(),
+});
+type DeleteRecall = z.infer<typeof deleteRecallRequestSchema>;
 
 export default async function handler(
   req: NextApiRequest,
@@ -51,43 +56,58 @@ export default async function handler(
   // Rest of the API logic
 
   // Checking if authorization header is valid
-  if (req.headers.authorization !== env.API_AUTH_HEADERS_KEY_GET_USER_RECALLS)
+  if (req.headers.authorization !== env.API_AUTH_HEADERS_KEY_UPDATE_RECALL)
     return res
       .status(403)
       .json({ msg: "Your authorization header is not valid" });
 
-    // Checking if request body is valid 
-    const parsedRequestData = userRecallRequestSchema.safeParse(req.body)
-    if (!parsedRequestData.success) return res.status(400).json({
+  // Checking if request body is valid
+  const requestData: DeleteRecall = { ...req.body };
+  requestData.nextRecall = new Date(requestData.nextRecall);
+  console.log("request Data", requestData);
+  const parsedRequestData = deleteRecallRequestSchema.safeParse(requestData);
+  console.log(parsedRequestData);
+  if (!parsedRequestData.success) {
+    return res.status(400).json({
       msg: "Please be sure to fill the body of your request with valid data. Refer to API documentation.",
     });
-      
+  }
+
   try {
     // Connecting to redis client
     await client.connect();
 
+    // Looking for recallID
     const recall = await recallRepository
       .search()
       .where("userId")
       .eq(`${parsedRequestData.data.userId}`)
-      .return.all();
-       console.log(recall)
-    if (!recall.length) {
+      .and("name")
+      .eq(`${parsedRequestData.data.name}`)
+      .return.firstId();
+    if (!recall?.length) {
       // Deconnecting from redis client
       await client.disconnect();
       return res.json({ message: "No recall in database" });
     }
-   
-    
+  
+    // Fetching recall to update it
+    const oldRecall = await recallRepository.fetch(recall);
+    console.log(oldRecall);
+    oldRecall.nextRecall = requestData.nextRecall;
+
+    // Saving recall plan to DB and since it already exist that updates it
+    const recallUpdated = await recallRepository.save(oldRecall);
+
+    res.json({ msg: "The recall plan has been updated successfully", recallUpdated });
+
     // Deconnecting from redis client
     await client.disconnect();
-    res.json({ msg: "Here are your user recall plans", recall });
   } catch (error) {
     console.log(error);
     res.status(500).json({
-      msg: "We could not the user recall plans recall plan. Please try again later or open an issue on Github",
+      msg: "We could not the delete recall plan. Please try again later or open an issue on Github",
       error,
     });
   }
-
 }

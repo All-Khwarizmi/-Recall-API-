@@ -5,14 +5,17 @@ import { env } from "~/env.mjs";
 import { recallRepository } from "./test";
 import { z } from "zod";
 
-client.on("error", (err) => console.log("Redis Client Error", err));
 
+client.on("error", (err: Error) => console.log("Redis Client Error", err));
+
+// Types
 type MiddlewareFnCallbackFn = (result: unknown) => unknown;
 type MiddlewareFn = (
   req: NextApiRequest,
   res: NextApiResponse,
   result: MiddlewareFnCallbackFn
 ) => void;
+
 // Initializing the cors middleware
 // You can read more about the available options here: https://github.com/expressjs/cors#configuration-options
 const cors = Cors({
@@ -36,10 +39,12 @@ function runMiddleware(
     });
   });
 }
-// Zod validation 
- const userRecallRequestSchema = z.object({
-  userId : z.string()
- })
+
+// Zod validation
+const deleteRecallRequestSchema = z.object({
+  userId: z.string(),
+  name: z.string(),
+});
 
 export default async function handler(
   req: NextApiRequest,
@@ -51,43 +56,45 @@ export default async function handler(
   // Rest of the API logic
 
   // Checking if authorization header is valid
-  if (req.headers.authorization !== env.API_AUTH_HEADERS_KEY_GET_USER_RECALLS)
+  if (req.headers.authorization !== env.API_AUTH_HEADERS_KEY_DELETE_RECALL)
     return res
       .status(403)
       .json({ msg: "Your authorization header is not valid" });
 
-    // Checking if request body is valid 
-    const parsedRequestData = userRecallRequestSchema.safeParse(req.body)
-    if (!parsedRequestData.success) return res.status(400).json({
+  // Checking if request body is valid
+  const parsedRequestData = deleteRecallRequestSchema.safeParse(req.body);
+  if (!parsedRequestData.success)
+    return res.status(400).json({
       msg: "Please be sure to fill the body of your request with valid data. Refer to API documentation.",
     });
-      
   try {
     // Connecting to redis client
     await client.connect();
 
+    // Looking for recallID
     const recall = await recallRepository
       .search()
       .where("userId")
       .eq(`${parsedRequestData.data.userId}`)
-      .return.all();
-       console.log(recall)
-    if (!recall.length) {
-      // Deconnecting from redis client
-      await client.disconnect();
-      return res.json({ message: "No recall in database" });
-    }
-   
-    
+      .and("name")
+      .eq(`${parsedRequestData.data.name}`)
+      .return.firstId();
+    if (!recall?.length) return res.json({ message: "No recall in database" });
+    console.log(recall);
+
+    // Removing recall plan from DB
+    const recallRemoved = await recallRepository.remove(recall);
+
+    res.json({ msg: "The recall plan has been deleted successfully", recall });
+
     // Deconnecting from redis client
     await client.disconnect();
-    res.json({ msg: "Here are your user recall plans", recall });
+
   } catch (error) {
     console.log(error);
     res.status(500).json({
-      msg: "We could not the user recall plans recall plan. Please try again later or open an issue on Github",
+      msg: "We could not the delete recall plan. Please try again later or open an issue on Github",
       error,
     });
   }
-
 }

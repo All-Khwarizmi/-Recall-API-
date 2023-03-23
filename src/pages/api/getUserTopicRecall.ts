@@ -6,22 +6,18 @@ import { recallRepository } from "./test";
 
 client.on("error", (err) => console.log("Redis Client Error", err));
 
-// Types 
+// Types
 type MiddlewareFnCallbackFn = (result: unknown) => unknown;
 type MiddlewareFn = (
   req: NextApiRequest,
   res: NextApiResponse,
   result: MiddlewareFnCallbackFn
 ) => void;
-
 // Initializing the cors middleware
 // You can read more about the available options here: https://github.com/expressjs/cors#configuration-options
 const cors = Cors({
   methods: ["POST", "GET", "HEAD"],
 });
-
-// TODO
-// creating a zod validation schema for recall incoming request
 
 // Helper method to wait for a middleware to execute before continuing
 // And to throw an error when an error happens in a middleware
@@ -41,6 +37,8 @@ function runMiddleware(
   });
 }
 
+// TODO : Zod validation
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
@@ -50,18 +48,22 @@ export default async function handler(
 
   // Rest of the API logic
 
-  // Checking if authorization header is valid
-  if (req.headers.authorization !== env.API_AUTH_HEADERS_KEY_GET_USER_RECALLS)
+  // TODO : change auth header
+  if (req.headers.authorization !== env.API_AUTH_HEADERS_KEY_TEST)
     return res
       .status(403)
       .json({ msg: "Your authorization header is not valid" });
-
+      
   // Connecting to redis client
   await client.connect();
 
-  const recall = await recallRepository.search().return.all();
+  const recall = await recallRepository
+    .search()
+    .where("userId")
+    .eq("req.body.userId")
+    .return.all();
 
-  res.json({ msg: "Here are all the recalls", recall });
+  res.json({ msg: "Hello there", recall });
 
   // Deconnecting from redis client
   await client.disconnect();

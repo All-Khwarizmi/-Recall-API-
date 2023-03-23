@@ -1,13 +1,25 @@
-import type { NextApiRequest, NextApiResponse } from "next";
-import Cors from "cors";
+import { NextApiRequest, NextApiResponse, NextApiHandler } from "next";
 import { client } from "lib/redis";
 import { env } from "~/env.mjs";
-import { z } from "zod";
 import { prisma } from "~/server/db";
-import { addDays } from "date-fns";
-
+import { Schema, Repository } from "redis-om";
+import { z } from "zod";
+import addDays from "date-fns/addDays";
 
 client.on("error", (err) => console.log("Redis Client Error", err));
+
+const recallSchema = new Schema("recall", {
+  name: { type: "string" },
+  userId: { type: "string" },
+  userEmail: { type: "string" },
+  userImage: { type: "string" },
+  userName: { type: "string" },
+  lastRecall: { type: "date" },
+  nextRecall: { type: "date" },
+  calendar: { type: "string[]" },
+});
+
+export const recallRepository = new Repository(recallSchema, client);
 
 // creating a zod validation schema for recall incoming request
 const addRecallSchema = z.object({
@@ -18,50 +30,16 @@ const addRecallSchema = z.object({
   userName: z.string(),
   lastRecall: z.date(),
   nextRecall: z.date(),
-  calendar: z.array(z.date()),
+  calendar: z.array(z.string()),
 });
-export type AddRecall = z.infer<typeof addRecallSchema >
-export type DayDate = Date
-type MiddlewareFnCallbackFn = (result: unknown) => unknown;
-type MiddlewareFn = (
-  req: NextApiRequest,
-  res: NextApiResponse,
-  result: MiddlewareFnCallbackFn
-) => void;
-// Initializing the cors middleware
-// You can read more about the available options here: https://github.com/expressjs/cors#configuration-options
-const cors = Cors({
-  methods: ["POST", "GET", "HEAD"],
-});
+export type AddRecall = z.infer<typeof addRecallSchema>;
+export type DayDate = Date;
 
-// Helper method to wait for a middleware to execute before continuing
-// And to throw an error when an error happens in a middleware
-function runMiddleware(
-  req: NextApiRequest,
-  res: NextApiResponse,
-  fn: MiddlewareFn
-) {
-  return new Promise((resolve, reject) => {
-    fn(req, res, (result: unknown) => {
-      if (result instanceof Error) {
-        return reject(result);
-      }
-
-      return resolve(result);
-    });
-  });
-}
-
-export default async function handler(
+export default async function handler<NextApiHandler>(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  // Run the middleware
-  await runMiddleware(req, res, cors);
-
-  // Rest of the API logic
-
-  
+  // Checking authorization headers
   if (req.headers.authorization !== env.API_AUTH_HEADERS_KEY_ADD_RECALL)
     return res
       .status(403)
@@ -69,53 +47,65 @@ export default async function handler(
 
 
   // Validating recall body with zod and typescript
- 
-const requestData: AddRecall = {
-  name: req.body.name,
-  userEmail: req.body.userEmail,
-  userId: req.body.userId,
-  userImage: req.body.userImage,
-  userName: req.body.userName,
-  lastRecall: new Date(),
-  nextRecall: addDays(Date.parse(Date()), 1),
-  calendar: req.body.calendar.map((item: string) => {
-   console.log(item );
-   console.log(Date.parse(item) );
-     return new Date(item);
-  }),
-};
 
-const parsedRequestData = addRecallSchema.safeParse(requestData);
-if (!parsedRequestData.success) return res.status(400).json({msg: 'Please be sure to fill the body of your request with valid data. Refer to API documentation.'})
-console.log("parsedRequestData", parsedRequestData);
+  const requestData: AddRecall = {
+    name: req.body.name,
+    userEmail: req.body.userEmail,
+    userId: req.body.userId,
+    userImage: req.body.userImage,
+    userName: req.body.userName,
+    lastRecall: new Date(),
+    nextRecall: addDays(Date.parse(Date()), 1),
+    calendar: req.body.calendar.map((item: string) => {
+     /*  console.log(item);
+      console.log(Date.parse(item)); */
+      return item;
+    }),
+  };
 
-// 
+  const parsedRequestData = addRecallSchema.safeParse(requestData);
+  if (!parsedRequestData.success)
+    return res.status(400).json({
+      msg: "Please be sure to fill the body of your request with valid data. Refer to API documentation.",
+    });
+  
 
-// Creating recall plan in Redis DB 
+  // Creating recall plan in Redis DB
+  try {
+    await client.connect();
 
-await client.connect()
+    // Checking in recall plan is already in DB
+    const isRecallInDB = await recallRepository
+      .search()
+      .where("userId")
+      .eq(`${parsedRequestData.data.userId}`)
+      .and("name")
+      .eq(`${parsedRequestData.data.name}`)
+      .return.return.all();
+    if (isRecallInDB.length) {
+      console.log(isRecallInDB.length);
+      return res.json({ message: "Recall already in database" });
+    }
 
-// Creating recall plan in DB postgres
-try {
+    // Creating recall plan in Redis DB
+    await recallRepository.createIndex();
 
-      const newRecall = await prisma.memoDate.create({
-         data: requestData,
-       });
-       res.json({
-         msg: `Here's the data you saved
-        name: ${newRecall.name},
-       userEmail: ${newRecall.userEmail},
-       userId: ${newRecall.userId},
-       userImage: ${newRecall.userImage},
-       userName: ${newRecall.userName},
-       last: ${newRecall.lastRecall},
-       next: ${newRecall.nextRecall},
-       calendar: ${newRecall.calendar}`,
-       });
+    const recall = await recallRepository.save(parsedRequestData.data);
+    console.log("recall", recall);
+
+    res
+      .status(200)
+      .json({
+        name: `Added successfully recall plan = ${JSON.stringify(recall)}`,
+      });
   } catch (error) {
-    console.log(error)
-    res.status(500).json({msg: 'We could not add the new recall plan. Please try again later or open an issue on Github', error})
+    console.log(error);
+    res.status(500).json({
+      msg: "We could not add the new recall plan. Please try again later or open an issue on Github",
+      error,
+    });
   }
 
-
+  // Deconnecting from redis client
+  await client.disconnect();
 }
