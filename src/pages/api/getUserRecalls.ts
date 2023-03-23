@@ -50,18 +50,25 @@ export default async function handler(
 
   // Rest of the API logic
 
+  // Checking request method
+  if (req.method !== "POST")
+    return res.status(400).json({
+      message: "Please be sure to fulfill the API request method requirements",
+    });
+    
   // Checking if authorization header is valid
   if (req.headers.authorization !== env.API_AUTH_HEADERS_KEY_GET_USER_RECALLS)
     return res
       .status(403)
       .json({ msg: "Your authorization header is not valid" });
 
-    // Checking if request body is valid 
-    const parsedRequestData = userRecallRequestSchema.safeParse(req.body)
-    if (!parsedRequestData.success) return res.status(400).json({
+  // Checking if request body is valid
+  const parsedRequestData = userRecallRequestSchema.safeParse(req.body);
+  if (!parsedRequestData.success)
+    return res.status(400).json({
       msg: "Please be sure to fill the body of your request with valid data. Refer to API documentation.",
     });
-      
+
   try {
     // Connecting to redis client
     await client.connect();
@@ -71,14 +78,13 @@ export default async function handler(
       .where("userId")
       .eq(`${parsedRequestData.data.userId}`)
       .return.all();
-       console.log(recall)
+    console.log(recall);
     if (!recall.length) {
       // Deconnecting from redis client
       await client.disconnect();
       return res.json({ message: "No recall in database" });
     }
-   
-    
+
     // Deconnecting from redis client
     await client.disconnect();
     res.json({ msg: "Here are your user recall plans", recall });
@@ -89,5 +95,4 @@ export default async function handler(
       error,
     });
   }
-
 }

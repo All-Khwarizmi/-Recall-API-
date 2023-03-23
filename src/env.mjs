@@ -27,12 +27,14 @@ const server = z.object({
   REDIS_PWD: z.string(),
   REDIS_HOST: z.string(),
   REDIS_PORT: z.string(),
+  SENDGRID_API_KEY: z.string(),
   API_AUTH_HEADERS_KEY_GET_USER_RECALLS: z.string(),
   API_AUTH_HEADERS_KEY_GET_USER_TOPIC_RECALL: z.string(),
   API_AUTH_HEADERS_KEY_GET_ALL_RECALLS: z.string(),
   API_AUTH_HEADERS_KEY_DELETE_RECALL: z.string(),
   API_AUTH_HEADERS_KEY_UPDATE_RECALL: z.string(),
   API_AUTH_HEADERS_KEY_GET_RECALLS_OF_DAY: z.string(),
+  API_AUTH_HEADERS_SEND_MSG: z.string(),
 });
 
 /**
@@ -59,15 +61,23 @@ const processEnv = {
   REDIS_URL: process.env.REDIS_URL,
   API_AUTH_HEADERS_KEY_TEST: process.env.API_AUTH_HEADERS_KEY_TEST,
   API_AUTH_HEADERS_KEY_ADD_RECALL: process.env.API_AUTH_HEADERS_KEY_ADD_RECALL,
-  API_AUTH_HEADERS_KEY_GET_USER_RECALLS: process.env.API_AUTH_HEADERS_KEY_GET_USER_RECALLS,
-  API_AUTH_HEADERS_KEY_GET_USER_TOPIC_RECALL: process.env.API_AUTH_HEADERS_KEY_GET_USER_TOPIC_RECALL,
-  API_AUTH_HEADERS_KEY_GET_ALL_RECALLS: process.env.API_AUTH_HEADERS_KEY_GET_ALL_RECALLS,
-  API_AUTH_HEADERS_KEY_DELETE_RECALL: process.env.API_AUTH_HEADERS_KEY_DELETE_RECALL,
-  API_AUTH_HEADERS_KEY_UPDATE_RECALL: process.env.API_AUTH_HEADERS_KEY_UPDATE_RECALL,
-  API_AUTH_HEADERS_KEY_GET_RECALLS_OF_DAY: process.env.API_AUTH_HEADERS_KEY_GET_RECALLS_OF_DAY,
+  API_AUTH_HEADERS_KEY_GET_USER_RECALLS:
+    process.env.API_AUTH_HEADERS_KEY_GET_USER_RECALLS,
+  API_AUTH_HEADERS_KEY_GET_USER_TOPIC_RECALL:
+    process.env.API_AUTH_HEADERS_KEY_GET_USER_TOPIC_RECALL,
+  API_AUTH_HEADERS_KEY_GET_ALL_RECALLS:
+    process.env.API_AUTH_HEADERS_KEY_GET_ALL_RECALLS,
+  API_AUTH_HEADERS_KEY_DELETE_RECALL:
+    process.env.API_AUTH_HEADERS_KEY_DELETE_RECALL,
+  API_AUTH_HEADERS_KEY_UPDATE_RECALL:
+    process.env.API_AUTH_HEADERS_KEY_UPDATE_RECALL,
+  API_AUTH_HEADERS_KEY_GET_RECALLS_OF_DAY:
+    process.env.API_AUTH_HEADERS_KEY_GET_RECALLS_OF_DAY,
   REDIS_PWD: process.env.REDIS_PWD,
   REDIS_HOST: process.env.REDIS_HOST,
   REDIS_PORT: process.env.REDIS_PORT,
+  SENDGRID_API_KEY: process.env.SENDGRID_API_KEY,
+  API_AUTH_HEADERS_SEND_MSG: process.env.API_AUTH_HEADERS_SEND_MSG,
   // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
 };
 
@@ -94,7 +104,7 @@ if (!!process.env.SKIP_ENV_VALIDATION == false) {
   if (parsed.success === false) {
     console.error(
       "❌ Invalid environment variables:",
-      parsed.error.flatten().fieldErrors,
+      parsed.error.flatten().fieldErrors
     );
     throw new Error("Invalid environment variables");
   }
@@ -108,7 +118,7 @@ if (!!process.env.SKIP_ENV_VALIDATION == false) {
         throw new Error(
           process.env.NODE_ENV === "production"
             ? "❌ Attempted to access a server-side environment variable on the client"
-            : `❌ Attempted to access server-side environment variable '${prop}' on the client`,
+            : `❌ Attempted to access server-side environment variable '${prop}' on the client`
         );
       return target[/** @type {keyof typeof target} */ (prop)];
     },

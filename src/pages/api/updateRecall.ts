@@ -55,6 +55,12 @@ export default async function handler(
 
   // Rest of the API logic
 
+  // Checking request method
+  if (req.method !== "POST")
+    return res.status(400).json({
+      message: "Please be sure to fulfill the API request method requirements",
+    });
+    
   // Checking if authorization header is valid
   if (req.headers.authorization !== env.API_AUTH_HEADERS_KEY_UPDATE_RECALL)
     return res
@@ -90,7 +96,7 @@ export default async function handler(
       await client.disconnect();
       return res.json({ message: "No recall in database" });
     }
-  
+
     // Fetching recall to update it
     const oldRecall = await recallRepository.fetch(recall);
     console.log(oldRecall);
@@ -99,7 +105,10 @@ export default async function handler(
     // Saving recall plan to DB and since it already exist that updates it
     const recallUpdated = await recallRepository.save(oldRecall);
 
-    res.json({ msg: "The recall plan has been updated successfully", recallUpdated });
+    res.json({
+      msg: "The recall plan has been updated successfully",
+      recallUpdated,
+    });
 
     // Deconnecting from redis client
     await client.disconnect();

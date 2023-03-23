@@ -55,6 +55,12 @@ export default async function handler(
 
   // Rest of the API logic
 
+  // Checking request method
+  if (req.method !== "POST")
+    return res.status(400).json({
+      message: "Please be sure to fulfill the API request method requirements",
+    });
+    
   // Checking if authorization header is valid
   if (req.headers.authorization !== env.API_AUTH_HEADERS_KEY_DELETE_RECALL)
     return res
@@ -79,8 +85,12 @@ export default async function handler(
       .and("name")
       .eq(`${parsedRequestData.data.name}`)
       .return.firstId();
-    if (!recall?.length) return res.json({ message: "No recall in database" });
-    console.log(recall);
+    if (!recall?.length) {
+      // Deconnecting from redis client
+      await client.disconnect();
+      console.log(recall);
+      return res.json({ message: "No recall in database" });
+    }
 
     // Removing recall plan from DB
     const recallRemoved = await recallRepository.remove(recall);
@@ -89,7 +99,7 @@ export default async function handler(
 
     // Deconnecting from redis client
     await client.disconnect();
-
+    
   } catch (error) {
     console.log(error);
     res.status(500).json({

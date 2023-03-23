@@ -5,10 +5,11 @@ import { prisma } from "~/server/db";
 import { Schema, Repository } from "redis-om";
 import { z } from "zod";
 import addDays from "date-fns/addDays";
+import { requestMethodChecker } from "lib/requestMethodChecker";
 
 client.on("error", (err) => console.log("Redis Client Error", err));
 
-const recallSchema = new Schema("recall", {
+export const recallSchema = new Schema("recall", {
   name: { type: "string" },
   userId: { type: "string" },
   userEmail: { type: "string" },
@@ -17,6 +18,7 @@ const recallSchema = new Schema("recall", {
   lastRecall: { type: "date" },
   nextRecall: { type: "date" },
   calendar: { type: "string[]" },
+  discordBotUrl: { type: "string" },
 });
 
 export const recallRepository = new Repository(recallSchema, client);
@@ -31,6 +33,7 @@ const addRecallSchema = z.object({
   lastRecall: z.date(),
   nextRecall: z.date(),
   calendar: z.array(z.string()),
+  discordBotUrl: z.string(),
 });
 export type AddRecall = z.infer<typeof addRecallSchema>;
 export type DayDate = Date;
@@ -39,12 +42,17 @@ export default async function handler<NextApiHandler>(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
+  // Checking request method
+  if (req.method !== "POST")
+    return res.status(400).json({
+      message: "Please be sure to fulfill the API request method requirements",
+    });
+
   // Checking authorization headers
   if (req.headers.authorization !== env.API_AUTH_HEADERS_KEY_ADD_RECALL)
     return res
       .status(403)
       .json({ msg: "Your authorization header is not valid" });
-
 
   // Validating recall body with zod and typescript
 
@@ -54,10 +62,11 @@ export default async function handler<NextApiHandler>(
     userId: req.body.userId,
     userImage: req.body.userImage,
     userName: req.body.userName,
+    discordBotUrl: req.body.discordBotUrl,
     lastRecall: new Date(),
     nextRecall: addDays(Date.parse(Date()), 1),
     calendar: req.body.calendar.map((item: string) => {
-     /*  console.log(item);
+      /*  console.log(item);
       console.log(Date.parse(item)); */
       return item;
     }),
@@ -68,7 +77,6 @@ export default async function handler<NextApiHandler>(
     return res.status(400).json({
       msg: "Please be sure to fill the body of your request with valid data. Refer to API documentation.",
     });
-  
 
   // Creating recall plan in Redis DB
   try {
@@ -83,6 +91,8 @@ export default async function handler<NextApiHandler>(
       .eq(`${parsedRequestData.data.name}`)
       .return.return.all();
     if (isRecallInDB.length) {
+      // Deconnecting from redis client
+      await client.disconnect();
       console.log(isRecallInDB.length);
       return res.json({ message: "Recall already in database" });
     }
@@ -93,11 +103,9 @@ export default async function handler<NextApiHandler>(
     const recall = await recallRepository.save(parsedRequestData.data);
     console.log("recall", recall);
 
-    res
-      .status(200)
-      .json({
-        name: `Added successfully recall plan = ${JSON.stringify(recall)}`,
-      });
+    res.status(200).json({
+      name: `Added successfully recall plan = ${JSON.stringify(recall)}`,
+    });
   } catch (error) {
     console.log(error);
     res.status(500).json({

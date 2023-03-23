@@ -20,8 +20,6 @@ const cors = Cors({
   methods: ["POST", "GET", "HEAD"],
 });
 
-// TODO
-// creating a zod validation schema for recall incoming request
 
 // Helper method to wait for a middleware to execute before continuing
 // And to throw an error when an error happens in a middleware
@@ -49,6 +47,12 @@ export default async function handler(
   await runMiddleware(req, res, cors);
 
   // Rest of the API logic
+
+  // Checking request method
+  if (req.method !== "GET")
+    return res.status(400).json({
+      message: "Please be sure to fulfill the API request method requirements",
+    });
 
   // Checking if authorization header is valid
   if (req.headers.authorization !== env.API_AUTH_HEADERS_KEY_GET_USER_RECALLS)
