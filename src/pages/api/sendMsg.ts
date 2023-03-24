@@ -4,7 +4,6 @@ import { env } from "~/env.mjs";
 import { z } from "zod";
 import axios from "axios";
 
-
 type MiddlewareFnCallbackFn = (result: unknown) => unknown;
 type MiddlewareFn = (
   req: NextApiRequest,
@@ -140,8 +139,6 @@ export default async function handler(
       const newRecallObj = recallsOfTodayParser(recallsOfToday);
       console.log("New recalls", newRecallObj);
 
-      res.json({ msg: "Here are your user recall plan", newRecallObj });
-
       // Getting keys in rewRecallObj to loop over it and send message to each user
       const newRecallObjKeys = Object.keys(newRecallObj);
 
@@ -175,7 +172,7 @@ Today you should study the following topics :
           body: JSON.stringify({ text: message }),
         };
 
-      await fetch(
+        await fetch(
           newRecallObj[user].discordBotUrl,
           newRecallObj[user].discordBotUrl.startsWith("https://discord")
             ? optionsDiscord
@@ -186,9 +183,10 @@ Today you should study the following topics :
           })
           .catch((error) => {
             console.log(error);
-          }).finally(() => console.log("Fetch finished sending message"));
+          })
+          .finally(() => console.log("Fetch finished sending message"));
 
-     /*    const axiosConfigDiscord = {
+        /*    const axiosConfigDiscord = {
           method: "POST",
           url: newRecallObj[user].discordBotUrl,
           headers: {
@@ -219,6 +217,8 @@ Today you should study the following topics :
            console.log("Axios finished sending messages");
           }); */
       });
+      console.log("After map message sender");
+      res.json({ msg: "Here are your user recall plan", newRecallObj });
     }
   } catch (error) {
     console.log(error);
