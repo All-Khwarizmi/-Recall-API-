@@ -2,10 +2,8 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import Cors from "cors";
 import { client } from "lib/redis";
 import { env } from "~/env.mjs";
-import { recallRepository } from "./test";
 import { z } from "zod";
-const sgMail = require("@sendgrid/mail");
-import { htmlEmail } from "lib/emailHtml";
+
 
 client.on("error", (err) => console.log("Redis Client Error", err));
 
@@ -81,7 +79,7 @@ export default async function handler(
       },
     };
     const responseRecallOfToday = await fetch(
-      "http://localhost:3000/api/getRecallsOfDay",
+      env.API_RECALL_OF_THE_DAY_ENDPOINT,
       optionsRecallOfToday
     );
     const recallsOfToday: RecallOfToday = await responseRecallOfToday.json();
@@ -90,77 +88,95 @@ export default async function handler(
     const parsedRecallsOfToday = recallsOfTodaySchema.safeParse(recallsOfToday);
     console.log("In sendMsg", parsedRecallsOfToday);
 
-    // Mapping over recalls of the day if any
-    if (parsedRecallsOfToday.success && parsedRecallsOfToday.data.recallObj.length) {
-      parsedRecallsOfToday.data.recallObj.map(async (recall) => {
-         const message = `
-    Today you should study the following topic :
-    ${recall.name}
-    
-  `;
-        const options = {
-          method: "POST",
-
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ content: message }),
-        };
-        const response = await fetch(recall.discordBotUrl, options);
-        console.log(response.status)
-      });
-    }
-    /*   const message = `
-    You should study the following topics :
-    ${memoOfTheDay.map((item) => "-" + item.name + "\n").join(" ")}
-  `;
-      const axiosConfig = {
-    method: "POST",
-    url: env.NEXT_PUBLIC_DISCORD_WEBHOOK_URI,
-    headers: {
-      "Content-Type": "application/json",
-    },
-    data: JSON.stringify({
-      content: message,
-    }),
-  };
-
-  axios(axiosConfig)
-    .then(function (response) {
-      console.log(response.status);
-    })
-    .catch(function (error) {
-      console.log(error);
-    })
-    .finally(function () {
-      // always executed
-    }); */
-
-    /*   // Sending email
-  (async () => {
-  try {
-    await sgMail.send(msg);
-  } catch (error: any) {
-    console.error(error);
-     if (error.response) {
-       console.error(error.response.body);
-     }
-  }
-})() 
-    const options = {
-      method: "POST",
-
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ content: message }),
+    type UserId = {
+      name: string;
+      discordBotUrl: string;
+      topics: string[];
     };
-    const response = await fetch("", options);
+    type NewRecallObj = {
+      userId: UserId;
+    };
+    /* *
+     * Helper function to parse incoming data containing the recall plans of today.
+     * @function
+     * @param {RecallOfToday} Recall plans of the day.
+     *
+     */
+    const recallsOfTodayParser = (data: RecallOfToday) => {
+      // Declaring variables. We use a set to filter since we need uniqueness
+      let filterObj: Set<string> = new Set();
+      let newRecallObj: any = {};
+      let a = 0;
+      const len = data.recallObj.length;
 
-    console.log(response.ok);
-    console.log(response.body);
-    console.log(req.body);
-    // console.log(req.headers)*/
+      // Let's loop over all the recalls and make a new object containing a single entry for each user that has some topic to recall today
+      if (len) {
+        while (a < len) {
+          // Check if userId is in set already
+          if (filterObj.has(data.recallObj[a]!.userId)) {
+            // If so add the topic to the topics array
+            newRecallObj[data.recallObj[a]!.userId].topics.push(
+              data.recallObj[a]!.name
+            );
+          } else {
+            // If not creates a userId property into the newRecallObj and instantiate it with an object
+            if (data.recallObj[a]!.userId) {
+              newRecallObj[data.recallObj[a]!.userId] = {
+                name: data.recallObj[a]!.userName,
+                discordBotUrl: data.recallObj[a]!.discordBotUrl,
+                topics: [data.recallObj[a]!.name],
+              };
+            }
+            // And add the userId to the filterObj helper set
+            filterObj.add(data.recallObj[a]!.userId);
+          }
+
+          a++;
+        }
+      }
+
+      return newRecallObj;
+    };
+
+    // Mapping over recalls of the day if any in order to filter the incoming data. That is making that we only send an message to the end user containing all the topics of the day despite having pontentially various topics object for a single user in the incoming data.
+    if (
+      parsedRecallsOfToday.success &&
+      parsedRecallsOfToday.data.recallObj.length
+    ) {
+      const newRecallObj = recallsOfTodayParser(recallsOfToday);
+      console.log("New recalls", newRecallObj);
+
+      // Getting keys in rewRecallObj to loop over it and send message to each user
+      const newRecallObjKeys = Object.keys(newRecallObj);
+
+      // Looping over each key and sending message to user 
+      newRecallObjKeys.forEach( async (user) => {
+        const message = `
+    Hi ${newRecallObj[user].name},
+    
+Today you should study the following topics :
+ ${newRecallObj[user].topics
+  .map((item: string) => "- " + item + "\n")
+  .join(" ")
+  .toString()}
+
+  Happy memorisation.
+
+  The Recal team
+  `;
+   const options = {
+     method: "POST",
+     headers: {
+       "Content-Type": "application/json",
+     },
+     body: JSON.stringify({ content: message }),
+   };
+   const response = await fetch(newRecallObj[user].discordBotUrl, options);
+    console.log(response.status);
+        return message;
+      });
+    
+    }
 
     res.json({ msg: "Here are your user recall plan", recallsOfToday });
   } catch (error) {

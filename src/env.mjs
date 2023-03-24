@@ -35,6 +35,7 @@ const server = z.object({
   API_AUTH_HEADERS_KEY_UPDATE_RECALL: z.string(),
   API_AUTH_HEADERS_KEY_GET_RECALLS_OF_DAY: z.string(),
   API_AUTH_HEADERS_SEND_MSG: z.string(),
+  API_RECALL_OF_THE_DAY_ENDPOINT: z.string(),
 });
 
 /**
@@ -78,6 +79,7 @@ const processEnv = {
   REDIS_PORT: process.env.REDIS_PORT,
   SENDGRID_API_KEY: process.env.SENDGRID_API_KEY,
   API_AUTH_HEADERS_SEND_MSG: process.env.API_AUTH_HEADERS_SEND_MSG,
+  API_RECALL_OF_THE_DAY_ENDPOINT: process.env.API_RECALL_OF_THE_DAY_ENDPOINT,
   // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
 };
 
