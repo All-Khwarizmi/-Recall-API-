@@ -161,7 +161,7 @@ Today you should study the following topics :
 
   The Recal team
   `;
-        const optionsDiscord = {
+    /*     const optionsDiscord = {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -187,7 +187,7 @@ Today you should study the following topics :
           })
           .catch((error) => {
             console.log(error);
-          });
+          }); */
 
         const axiosConfigDiscord = {
           method: "POST",
