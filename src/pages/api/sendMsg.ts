@@ -184,7 +184,11 @@ Today you should study the following topics :
           .catch((error) => {
             console.log(error);
           })
-          .finally(() => console.log("Fetch finished sending message"));
+          .finally(() => {
+            console.log("Fetch finished sending messages");
+            res.status(201).json({ msg: "Here are your user recall plan", newRecallObj });
+            console.log("After sending message into HTTP response");
+          }); 
 
         /*    const axiosConfigDiscord = {
           method: "POST",
@@ -217,8 +221,7 @@ Today you should study the following topics :
            console.log("Axios finished sending messages");
           }); */
       });
-      console.log("After map message sender");
-      res.json({ msg: "Here are your user recall plan", newRecallObj });
+      
     }
   } catch (error) {
     console.log(error);
