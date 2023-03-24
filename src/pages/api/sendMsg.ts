@@ -161,24 +161,27 @@ Today you should study the following topics :
 
   The Recal team
   `;
-        const options = {
+        const optionsDiscord = {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({ content: message }),
         };
-        const axiosConfig = {
+        const optionsSlack = {
           method: "POST",
-          url: newRecallObj[user].discordBotUrl,
           headers: {
             "Content-Type": "application/json",
           },
-          data: JSON.stringify({
-            content: message,
-          }),
+          body: JSON.stringify({ text: message }),
         };
-        fetch(newRecallObj[user].discordBotUrl, options)
+
+        fetch(
+          newRecallObj[user].discordBotUrl,
+          newRecallObj[user].discordBotUrl.startsWith("https://discord")
+            ? optionsDiscord
+            : optionsSlack
+        )
           .then((response) => {
             console.log("Fetch", response.status);
           })
@@ -186,8 +189,28 @@ Today you should study the following topics :
             console.log(error);
           });
 
-        axios(axiosConfig)
-          .then(function (response) {
+        const axiosConfigDiscord = {
+          method: "POST",
+          url: newRecallObj[user].discordBotUrl,
+          headers: {
+            "Content-Type": "application/json",
+          },
+          data: JSON.stringify({ content: message }),
+        };
+        const axiosConfigSlack = {
+          method: "POST",
+          url: newRecallObj[user].discordBotUrl,
+          headers: {
+            "Content-Type": "application/json",
+          },
+          data: JSON.stringify({ text: message }),
+        };
+        axios(
+          newRecallObj[user].discordBotUrl.startsWith("https://discord")
+            ? axiosConfigDiscord
+            : axiosConfigSlack
+        )
+          .then(function (response: any) {
             console.log("Axios", response.status);
           })
           .catch(function (error) {
