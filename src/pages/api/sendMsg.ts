@@ -143,7 +143,7 @@ export default async function handler(
       const newRecallObjKeys = Object.keys(newRecallObj);
 
       // Looping over each key and sending message to user
-      newRecallObjKeys.forEach(async (user) => {
+      newRecallObjKeys.forEach((user) => {
         const message = `
     Hi ${newRecallObj[user].name},
     
@@ -172,7 +172,7 @@ Today you should study the following topics :
           body: JSON.stringify({ text: message }),
         };
 
-        await fetch(
+        fetch(
           newRecallObj[user].discordBotUrl,
           newRecallObj[user].discordBotUrl.startsWith("https://discord")
             ? optionsDiscord
@@ -186,9 +186,11 @@ Today you should study the following topics :
           })
           .finally(() => {
             console.log("Fetch finished sending messages");
-            res.status(201).json({ msg: "Here are your user recall plan", newRecallObj });
+            res
+              .status(201)
+              .json({ msg: "Here are your user recall plan", newRecallObj });
             console.log("After sending message into HTTP response");
-          }); 
+          });
 
         /*    const axiosConfigDiscord = {
           method: "POST",
@@ -221,7 +223,6 @@ Today you should study the following topics :
            console.log("Axios finished sending messages");
           }); */
       });
-      
     }
   } catch (error) {
     console.log(error);
