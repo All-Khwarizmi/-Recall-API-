@@ -3,6 +3,7 @@ import Cors from "cors";
 import { client } from "lib/redis";
 import { env } from "~/env.mjs";
 import { z } from "zod";
+import axios from "axios";
 
 
 client.on("error", (err) => console.log("Redis Client Error", err));
@@ -166,8 +167,29 @@ Today you should study the following topics :
      },
      body: JSON.stringify({ content: message }),
    };
-   const response = await fetch(newRecallObj[user].discordBotUrl, options);
-    console.log(response.status);
+    const axiosConfig = {
+      method: "POST",
+      url: newRecallObj[user].discordBotUrl,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      data: JSON.stringify({
+        content: message
+      }),
+    };
+
+    axios(axiosConfig)
+      .then(function (response) {
+        console.log(response.status);
+      })
+      .catch(function (error) {
+        console.log(error);
+      })
+      .finally(function () {
+        // always executed
+      });
+// const response = await fetch(newRecallObj[user].discordBotUrl, options);
+  //  console.log(response.status);
         return message;
       });
     
