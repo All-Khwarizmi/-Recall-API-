@@ -99,7 +99,7 @@ export default async function handler(
 
     `;
 
-    // Configuring axios to send message
+    // Configuring axios to send messag
     const axiosConfigDiscord = {
       method: "POST",
       url: parsedRequestData.data.botUrl,
