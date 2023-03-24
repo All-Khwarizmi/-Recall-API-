@@ -99,6 +99,39 @@ export default async function handler(
 
     `;
 
+    // Configuring fetch and sending message
+     const optionsDiscord = {
+       method: "POST",
+       headers: {
+         "Content-Type": "application/json",
+       },
+       body: JSON.stringify({ content: message }),
+     };
+     const optionsSlack = {
+       method: "POST",
+       headers: {
+         "Content-Type": "application/json",
+       },
+       body: JSON.stringify({ text: message }),
+     };
+    fetch(parsedRequestData.data.botUrl,
+          parsedRequestData.data.botUrl.startsWith("https://discord")
+            ? optionsDiscord
+            : optionsSlack
+    )
+      .then((response) => {
+        console.log("Fetch", response.status);
+      })
+      .catch((error) => {
+        console.log("Fetch", error);
+      })
+      .finally(() => {
+        console.log("Fetch finished sending messages");
+        res.status(201).json({ msg: message });
+        console.log("After sending message into HTTP response");
+      }); 
+
+/* 
     // Configuring axios to send messag
     const axiosConfigDiscord = {
       method: "POST",
@@ -129,9 +162,11 @@ export default async function handler(
       })
       .finally(function () {
         console.log("Axios finished sending messages");
-      });
-    console.log("After map message sender");
-    res.json({ msg: "Here are your user recall plan" });
+         res.json({ msg: message });
+          console.log("After map message response to request");
+      }); */
+   
+   
   } catch (error) {
     console.log(error);
     res.status(500).json({
