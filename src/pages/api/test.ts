@@ -6,8 +6,6 @@ import { Schema, Repository } from "redis-om";
 import { z } from "zod";
 import addDays from "date-fns/addDays";
 
-client.on("error", (err) => console.log("Redis Client Error", err));
-
 const recallSchema = new Schema("recall", {
   name: { type: "string" },
   userId: { type: "string" },
@@ -71,6 +69,7 @@ export default async function handler<NextApiHandler>(
 
   // Creating recall plan in Redis DB
 try {
+  client.on("error", (err) => console.log("Redis Client Error", err));
   await client.connect();
   await recallRepository.createIndex()
   

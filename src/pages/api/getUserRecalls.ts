@@ -5,8 +5,6 @@ import { env } from "~/env.mjs";
 import { recallRepository } from "./test";
 import { z } from "zod";
 
-client.on("error", (err) => console.log("Redis Client Error", err));
-
 type MiddlewareFnCallbackFn = (result: unknown) => unknown;
 type MiddlewareFn = (
   req: NextApiRequest,
@@ -71,6 +69,7 @@ export default async function handler(
 
   try {
     // Connecting to redis client
+    client.on("error", (err) => console.log("Redis Client Error", err));
     await client.connect();
 
     const recall = await recallRepository

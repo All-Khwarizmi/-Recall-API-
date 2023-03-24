@@ -7,8 +7,6 @@ import { z } from "zod";
 import addDays from "date-fns/addDays";
 import { requestMethodChecker } from "lib/requestMethodChecker";
 
-client.on("error", (err) => console.log("Redis Client Error", err));
-
 export const recallSchema = new Schema("recall", {
   name: { type: "string" },
   userId: { type: "string" },
@@ -80,6 +78,7 @@ export default async function handler<NextApiHandler>(
 
   // Creating recall plan in Redis DB
   try {
+    client.on("error", (err) => console.log("Redis Client Error", err));
     await client.connect();
 
     // Checking in recall plan is already in DB

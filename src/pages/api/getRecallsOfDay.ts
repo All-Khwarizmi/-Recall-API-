@@ -3,11 +3,7 @@ import Cors from "cors";
 import { client } from "lib/redis";
 import { env } from "~/env.mjs";
 import { recallRepository } from "./test";
-import { Where } from "redis-om";
 import { addDays } from "date-fns";
-import { AddRecall } from "./addRecall";
-
-client.on("error", (err) => console.log("Redis Client Error", err));
 
 // Types
 type MiddlewareFnCallbackFn = (result: unknown) => unknown;
@@ -63,6 +59,7 @@ export default async function handler(
       .json({ msg: "Your authorization header is not valid" });
 
   // Connecting to redis client
+  client.on("error", (err) => console.log("Redis Client Error", err));
   await client.connect();
 
   // Setting up variables for date query

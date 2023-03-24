@@ -4,8 +4,6 @@ import { client } from "lib/redis";
 import { env } from "~/env.mjs";
 import { recallRepository } from "./test";
 
-client.on("error", (err) => console.log("Redis Client Error", err));
-
 // Types 
 type MiddlewareFnCallbackFn = (result: unknown) => unknown;
 type MiddlewareFn = (
@@ -61,6 +59,7 @@ export default async function handler(
       .json({ msg: "Your authorization header is not valid" });
 
   // Connecting to redis client
+  client.on("error", (err) => console.log("Redis Client Error", err));
   await client.connect();
 
   const recall = await recallRepository.search().return.all();

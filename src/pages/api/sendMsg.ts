@@ -1,11 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import Cors from "cors";
-import { client } from "lib/redis";
 import { env } from "~/env.mjs";
 import { z } from "zod";
 import axios from "axios";
 
-client.on("error", (err) => console.log("Redis Client Error", err));
 
 type MiddlewareFnCallbackFn = (result: unknown) => unknown;
 type MiddlewareFn = (

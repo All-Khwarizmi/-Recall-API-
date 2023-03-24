@@ -5,9 +5,6 @@ import { env } from "~/env.mjs";
 import { recallRepository } from "./test";
 import { z } from "zod";
 
-
-client.on("error", (err: Error) => console.log("Redis Client Error", err));
-
 // Types
 type MiddlewareFnCallbackFn = (result: unknown) => unknown;
 type MiddlewareFn = (
@@ -75,6 +72,7 @@ export default async function handler(
     });
   try {
     // Connecting to redis client
+    client.on("error", (err) => console.log("Redis Client Error", err));
     await client.connect();
 
     // Looking for recallID
