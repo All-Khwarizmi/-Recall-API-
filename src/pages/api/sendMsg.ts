@@ -35,6 +35,7 @@ function runMiddleware(
   });
 }
 
+// Zod validation schema
 const recallsOfTodaySchema = z.object({
   msg: z.string(),
   recallObj: z.array(
@@ -145,7 +146,7 @@ export default async function handler(
       const newRecallObjKeys = Object.keys(newRecallObj);
 
       // Looping over each key and sending message to user
-      newRecallObjKeys.forEach((user) => {
+      newRecallObjKeys.forEach(async (user) => {
         const message = `
     Hi ${newRecallObj[user].name},
     
@@ -159,7 +160,7 @@ Today you should study the following topics :
 
   The Recal team
   `;
-    /*     const optionsDiscord = {
+        const optionsDiscord = {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -174,7 +175,7 @@ Today you should study the following topics :
           body: JSON.stringify({ text: message }),
         };
 
-        fetch(
+      await fetch(
           newRecallObj[user].discordBotUrl,
           newRecallObj[user].discordBotUrl.startsWith("https://discord")
             ? optionsDiscord
@@ -185,9 +186,9 @@ Today you should study the following topics :
           })
           .catch((error) => {
             console.log(error);
-          }); */
+          }).finally(() => console.log("Fetch finished sending message"));
 
-        const axiosConfigDiscord = {
+     /*    const axiosConfigDiscord = {
           method: "POST",
           url: newRecallObj[user].discordBotUrl,
           headers: {
@@ -212,11 +213,11 @@ Today you should study the following topics :
             console.log("Axios", response.status);
           })
           .catch(function (error) {
-            console.log(error);
+            console.log("Axios", error);
           })
           .finally(function () {
-            // always executed
-          });
+           console.log("Axios finished sending messages");
+          }); */
       });
     }
   } catch (error) {
