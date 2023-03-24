@@ -5,7 +5,6 @@ import { env } from "~/env.mjs";
 import { z } from "zod";
 import axios from "axios";
 
-
 client.on("error", (err) => console.log("Redis Client Error", err));
 
 type MiddlewareFnCallbackFn = (result: unknown) => unknown;
@@ -60,7 +59,7 @@ export default async function handler(
   // Rest of the API logic
 
   // Checking if authorization header is valid
-  console.log(req.body)
+  console.log(req.body);
   if (req.body.content !== env.API_AUTH_HEADERS_SEND_MSG)
     return res
       .status(403)
@@ -145,54 +144,52 @@ export default async function handler(
       // Getting keys in rewRecallObj to loop over it and send message to each user
       const newRecallObjKeys = Object.keys(newRecallObj);
 
-      // Looping over each key and sending message to user 
-      newRecallObjKeys.forEach( async (user) => {
+      // Looping over each key and sending message to user
+      newRecallObjKeys.forEach(async (user) => {
         const message = `
     Hi ${newRecallObj[user].name},
     
 Today you should study the following topics :
  ${newRecallObj[user].topics
-  .map((item: string) => "- " + item + "\n")
-  .join(" ")
-  .toString()}
+   .map((item: string) => "- " + item + "\n")
+   .join(" ")
+   .toString()}
 
   Happy memorisation.
 
   The Recal team
   `;
-   const options = {
-     method: "POST",
-     headers: {
-       "Content-Type": "application/json",
-     },
-     body: JSON.stringify({ content: message }),
-   };
-    const axiosConfig = {
-      method: "POST",
-      url: newRecallObj[user].discordBotUrl,
-      headers: {
-        "Content-Type": "application/json",
-      },
-      data: JSON.stringify({
-        content: message
-      }),
-    };
+        const options = {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ content: message }),
+        };
+        const axiosConfig = {
+          method: "POST",
+          url: newRecallObj[user].discordBotUrl,
+          headers: {
+            "Content-Type": "application/json",
+          },
+          data: JSON.stringify({
+            content: message,
+          }),
+        };
 
-    axios(axiosConfig)
-      .then(function (response) {
+        axios(axiosConfig)
+          .then(function (response) {
+            console.log(response.status);
+          })
+          .catch(function (error) {
+            console.log(error);
+          })
+          .finally(function () {
+            // always executed
+          });
+        const response = await fetch(newRecallObj[user].discordBotUrl, options);
         console.log(response.status);
-      })
-      .catch(function (error) {
-        console.log(error);
-      })
-      .finally(function () {
-        // always executed
       });
-// const response = await fetch(newRecallObj[user].discordBotUrl, options);
-  //  console.log(response.status);
-        return message;
-      });
-    
     }
 
     res.json({ msg: "Here are your user recall plan", recallsOfToday });
