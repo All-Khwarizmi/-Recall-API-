@@ -55,7 +55,7 @@ export default async function handler(
     });
 
   // Checking if authorization header is valid
-  if (req.headers.authorization !== env.API_AUTH_HEADERS_KEY_GET_USER_RECALLS)
+  if (req.headers.authorization !== env.API_AUTH_HEADERS_KEY_GET_ALL_RECALLS)
     return res
       .status(403)
       .json({ msg: "Your authorization header is not valid" });

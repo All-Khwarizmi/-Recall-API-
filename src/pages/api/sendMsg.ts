@@ -141,11 +141,13 @@ export default async function handler(
       const newRecallObj = recallsOfTodayParser(recallsOfToday);
       console.log("New recalls", newRecallObj);
 
+      res.json({ msg: "Here are your user recall plan", newRecallObj });
+
       // Getting keys in rewRecallObj to loop over it and send message to each user
       const newRecallObjKeys = Object.keys(newRecallObj);
 
       // Looping over each key and sending message to user
-      newRecallObjKeys.forEach(async (user) => {
+      newRecallObjKeys.forEach((user) => {
         const message = `
     Hi ${newRecallObj[user].name},
     
@@ -176,10 +178,17 @@ Today you should study the following topics :
             content: message,
           }),
         };
+        fetch(newRecallObj[user].discordBotUrl, options)
+          .then((response) => {
+            console.log("Fetch", response.status);
+          })
+          .catch((error) => {
+            console.log(error);
+          });
 
         axios(axiosConfig)
           .then(function (response) {
-            console.log(response.status);
+            console.log("Axios", response.status);
           })
           .catch(function (error) {
             console.log(error);
@@ -187,12 +196,8 @@ Today you should study the following topics :
           .finally(function () {
             // always executed
           });
-        const response = await fetch(newRecallObj[user].discordBotUrl, options);
-        console.log(response.status);
       });
     }
-
-    res.json({ msg: "Here are your user recall plan", recallsOfToday });
   } catch (error) {
     console.log(error);
     res.status(500).json({
