@@ -8,7 +8,7 @@ import addDays from "date-fns/addDays";
 import { requestMethodChecker } from "lib/requestMethodChecker";
 
 export const recallSchema = new Schema("recall", {
-  name: { type: "string" },
+  topicName: { type: "string" },
   userId: { type: "string" },
   userEmail: { type: "string" },
   userImage: { type: "string" },
@@ -23,15 +23,26 @@ export const recallRepository = new Repository(recallSchema, client);
 
 // creating a zod validation schema for recall incoming request
 const addRecallSchema = z.object({
-  name: z.string(),
+  topicName: z.string(),
   userId: z.string(),
   userEmail: z.string().email(),
   userImage: z.string(),
   userName: z.string(),
   lastRecall: z.date(),
   nextRecall: z.date(),
-  calendar: z.array(z.string()),
-  discordBotUrl: z.string(),
+  calendar: z.object({
+    recallOne: z.string(),
+    recallTwo: z.string(),
+    recallThree: z.string(),
+    recallFour: z.string(),
+    recallFive: z.string(),
+    recallSix: z.string(),
+    recallSeven: z.string(),
+    recallEight: z.string(),
+    recallNine: z.string(),
+    recallTen: z.string(),
+  }),
+  botUrl: z.string(),
 });
 export type AddRecall = z.infer<typeof addRecallSchema>;
 export type DayDate = Date;
@@ -55,27 +66,25 @@ export default async function handler<NextApiHandler>(
   // Validating recall body with zod and typescript
 
   const requestData: AddRecall = {
-    name: req.body.name,
+    topicName: req.body.topicName,
     userEmail: req.body.userEmail,
     userId: req.body.userId,
     userImage: req.body.userImage,
     userName: req.body.userName,
-    discordBotUrl: req.body.discordBotUrl,
-    lastRecall: new Date(),
-    nextRecall: addDays(Date.parse(Date()), 1),
-    calendar: req.body.calendar.map((item: string) => {
-      /*  console.log(item);
-      console.log(Date.parse(item)); */
-      return item;
-    }),
+    botUrl: req.body.botUrl,
+    lastRecall: new Date(req.body.lastRecall),
+    nextRecall: new Date(req.body.nextRecall),
+    calendar: req.body.calendar
   };
-
+ // console.log(requestData);
   const parsedRequestData = addRecallSchema.safeParse(requestData);
+ 
   if (!parsedRequestData.success)
     return res.status(400).json({
       msg: "Please be sure to fill the body of your request with valid data. Refer to API documentation.",
     });
 
+    
   // Creating recall plan in Redis DB
   try {
     client.on("error", (err) => console.log("Redis Client Error", err));
@@ -86,14 +95,15 @@ export default async function handler<NextApiHandler>(
       .search()
       .where("userId")
       .eq(`${parsedRequestData.data.userId}`)
-      .and("name")
-      .eq(`${parsedRequestData.data.name}`)
+      .and("topicName")
+      .eq(`${parsedRequestData.data.topicName}`)
       .return.return.all();
     if (isRecallInDB.length) {
       // Deconnecting from redis client
       await client.disconnect();
       console.log(isRecallInDB.length);
-      return res.json({ message: "Recall already in database" });
+      console.log("Recall already in DB");
+      return res.status(208).json({ message: "Recall already in database" });
     }
 
     // Creating recall plan in Redis DB

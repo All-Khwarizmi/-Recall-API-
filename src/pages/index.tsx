@@ -1,24 +1,18 @@
 import { type NextPage } from "next";
-import Head from "next/head";
+
 import Link from "next/link";
 import { signIn, signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 
 import { api } from "~/utils/api";
+import Header from "~/components/Header";
 
 const Home: NextPage = () => {
   const { data: sessionData } = useSession();
 
   return (
     <>
-      <Head>
-        <title>Recal</title>
-        <meta
-          name="description"
-          content="Recal is the best, neuroscience based, way to scheudle a study planning and remember things on the long run. We handle the scheduling and the optimization part so can be more efficient and productive."
-        />
-        <link rel="icon" href="/memory-recall.png" />
-      </Head>
+     <Header />
       <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#005a80] to-[#0d003d] text-slate-100">
         <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16 ">
           <h1 className="text-5xl font-extrabold tracking-tight text-white sm:text-[5rem]">
@@ -46,7 +40,7 @@ const Home: NextPage = () => {
             <AuthShowcase />
             {sessionData?.user ? (
               <Link
-                href={"./tryout"}
+                href={"./recalls"}
                 className="rounded-full bg-white/10 px-10 py-3 font-semibold text-white no-underline transition hover:bg-white/20"
               >
                 Enter

@@ -41,7 +41,7 @@ const recallsOfTodaySchema = z.object({
     z.object({
       userName: z.string(),
       userId: z.string(),
-      discordBotUrl: z.string(),
+      botUrl: z.string(),
       name: z.string(),
     })
   ),
@@ -81,14 +81,7 @@ export default async function handler(
     const parsedRecallsOfToday = recallsOfTodaySchema.safeParse(recallsOfToday);
     console.log("In sendMsg", parsedRecallsOfToday);
 
-    type UserId = {
-      name: string;
-      discordBotUrl: string;
-      topics: string[];
-    };
-    type NewRecallObj = {
-      userId: UserId;
-    };
+
     /* *
      * Helper function to parse incoming data containing the recall plans of today.
      * @function
@@ -116,7 +109,7 @@ export default async function handler(
             if (data.recallObj[a]!.userId) {
               newRecallObj[data.recallObj[a]!.userId] = {
                 name: data.recallObj[a]!.userName,
-                discordBotUrl: data.recallObj[a]!.discordBotUrl,
+                discordBotUrl: data.recallObj[a]!.botUrl,
                 topics: [data.recallObj[a]!.name],
               };
             }
@@ -173,8 +166,8 @@ Today you should study the following topics :
         };
 
         fetch(
-          newRecallObj[user].discordBotUrl,
-          newRecallObj[user].discordBotUrl.startsWith("https://discord")
+          newRecallObj[user].botUrl,
+          newRecallObj[user].botUrl.startsWith("https://discord")
             ? optionsDiscord
             : optionsSlack
         )

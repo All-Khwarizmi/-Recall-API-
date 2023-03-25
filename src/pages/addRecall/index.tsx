@@ -1,16 +1,70 @@
-import React from "react";
+import { Spinner } from "@chakra-ui/react";
+import { NextPage } from "next";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/router";
+import React, { useEffect, useMemo, useState } from "react";
 import Header from "~/components/Header";
-import { useState, useRef } from "react";
 import { env } from "~/env.mjs";
+import { calendar } from "lib/helpers";
+import {CgSpinner} from "react-icons/cg"
 
-const Tryout = () => {
+const AddRecall: NextPage = () => {
+  // Checking if user is authenticated, redirecting otherwise
+  const router = useRouter();
+  const { status, data: session } = useSession({
+    required: true,
+    onUnauthenticated() {
+      router.back();
+    },
+  });
+
   const [userName, setUserName] = useState<string>("");
   const [topic, setTopic] = useState<string>("");
   const [botUrl, setBotUrl] = useState<string>("");
+  const newCalendar = useMemo(calendar, []);
 
-  const handleUserNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setUserName(e.target.value);
-  };
+  const options = useMemo(() => {
+    return {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: env.NEXT_PUBLIC_API_AUTH_HEADERS_ADD_RECALL,
+      },
+      body: JSON.stringify({
+        userName,
+        topicName: topic,
+        botUrl,
+        userEmail: session?.user.email,
+        userId: session?.user.id,
+        userImage: session?.user.image,
+        calendar: newCalendar,
+        lastRecall: new Date(),
+        nextRecall: new Date(newCalendar.recallOne),
+      }),
+    };
+  }, [botUrl, userName]);
+  // Synchronizing userName input with user session data
+  useEffect(() => {
+    if (status === "loading") {
+      setUserName("");
+    } else {
+      setUserName(session?.user.name!);
+    }
+  }, [status]);
+
+  // Displaying spinner while loading user session data
+  if (status === "loading") {
+    return (
+      <>
+        <Header />
+        <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#005a80] to-[#0d003d] text-slate-100">
+      <CgSpinner  className="animate-spin text-7xl"/>
+        </main>
+      </>
+    );
+  }
+
+  // Input and validation form handlers
   const handleTopicNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setTopic(e.target.value);
   };
@@ -24,29 +78,23 @@ const Tryout = () => {
       return alert("Please be sure to enter a valid url");
     }
 
-    const options = {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: env.NEXT_PUBLIC_API_AUTH_HEADERS_TRY_RECALL,
-      },
-      body: JSON.stringify({ userName, topicName: topic, botUrl }),
-    };
+    console.log(JSON.parse(options.body));
 
     const data: unknown = fetch(
-      env.NEXT_PUBLIC_API_TRY_RECALL_ENDPOINT,
+      env.NEXT_PUBLIC_API_ADD_RECALL_ENDPOINT,
       options
     )
       .then((response) => {
         console.log(response);
-        if (response.ok) {
+        if (response.ok && response.status !== 208) {
           window.alert(
-            "Message sent successfully. Please check your messaging app channel"
+            "Recall added successfully. Please check your dashboard"
           );
           setTopic("");
           setBotUrl("");
-
           setUserName("");
+        } else if (response.status === 208) {
+          window.alert("Recall already in database. Please choose another topic name");
         }
         return response.json();
       })
@@ -67,21 +115,19 @@ const Tryout = () => {
               Your name
             </label>
             <input
-              required
-              autoFocus
+              disabled
               id="user name"
               name="user name"
               type="text"
               value={userName}
-              onChange={(e) => handleUserNameChange(e)}
-              className="focus-visible  grow rounded-lg border border-gray-600 bg-transparent py-1 px-2 tracking-wide  focus:outline-slate-300"
-              placeholder="Mark"
+              className="focus-visible grow rounded-lg border border-gray-600 bg-transparent py-1 px-2 tracking-wide text-gray-500  focus:outline-slate-300"
             />
             <div className="p-3"></div>
             <label htmlFor="topic" className="pb-2 uppercase tracking-wider">
               Topic name
             </label>
             <input
+              autoFocus
               required
               id="topic"
               name="topic"
@@ -105,11 +151,12 @@ const Tryout = () => {
               type="url"
               pattern="https://.*"
               onChange={(e) => handleBotUrlChange(e)}
+              value={botUrl}
               className="grow  rounded-lg border border-gray-600 bg-transparent py-1 px-2 tracking-wide ring-slate-300 focus:outline-slate-300"
               placeholder="https://discord.com/api/webhooks/1088529850555433010/IDMlYPu"
             />
-
             <div className="p-3"></div>
+
             <button
               type="submit"
               className="rounded-full bg-white/10 px-10 py-3 font-semibold text-white no-underline transition hover:bg-white/20"
@@ -124,4 +171,4 @@ const Tryout = () => {
   );
 };
 
-export default Tryout;
+export default AddRecall;

@@ -40,7 +40,7 @@ const tryRecallSchema = z.object({
   userName: z.string(),
   botUrl: z.string(),
   topicName: z.string(),
-  time: z.string(),
+ 
 });
 type RecallOfToday = z.infer<typeof tryRecallSchema>;
 export default async function handler(
@@ -93,7 +93,7 @@ export default async function handler(
     ${newCalendar.recallNine}
     ${newCalendar.recallTen}
   
-    You will be notified at ${parsedRequestData.data.time}
+  
 
       Happy memorisation.
 
