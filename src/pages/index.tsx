@@ -31,7 +31,14 @@ const Home: NextPage = () => {
             />
           </h1>
           <div className="w-screen text-center">
-            <h1 className="text-5xl font-bold pb-2"> Recal</h1>
+            <h1
+              className="pb-2 text-5xl font-bold  
+  first-letter:text-7xl first-letter:font-bold first-letter:text-white
+  first-line:uppercase first-line:tracking-widest"
+            >
+              {" "}
+              Recal
+            </h1>
             <h3 className="italic text-gray-400">The best way to learn</h3>
           </div>
 

@@ -44,6 +44,8 @@ const server = z.object({
  * built with invalid env vars. To expose them to the client, prefix them with `NEXT_PUBLIC_`.
  */
 const client = z.object({
+  NEXT_PUBLIC_API_AUTH_HEADERS_TRY_RECALL: z.string(),
+  NEXT_PUBLIC_API_TRY_RECALL_ENDPOINT: z.string(),
   // NEXT_PUBLIC_CLIENTVAR: z.string().min(1),
 });
 
@@ -82,6 +84,12 @@ const processEnv = {
   API_AUTH_HEADERS_SEND_MSG: process.env.API_AUTH_HEADERS_SEND_MSG,
   API_RECALL_OF_THE_DAY_ENDPOINT: process.env.API_RECALL_OF_THE_DAY_ENDPOINT,
   API_AUTH_HEADERS_TRY_RECALL: process.env.API_AUTH_HEADERS_TRY_RECALL,
+  NEXT_PUBLIC_API_AUTH_HEADERS_TRY_RECALL:
+    process.env.NEXT_PUBLIC_API_AUTH_HEADERS_TRY_RECALL,
+    // Endpoints
+  NEXT_PUBLIC_API_TRY_RECALL_ENDPOINT:
+    process.env.NEXT_PUBLIC_API_TRY_RECALL_ENDPOINT,
+
   // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
 };
 
