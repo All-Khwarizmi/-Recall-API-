@@ -47,7 +47,8 @@ export default async function handler(
   await runMiddleware(req, res, cors);
 
   // Rest of the API logic
-
+console.log(req.headers)
+console.log(req.body)
   // Checking request method
   if (req.method !== "POST")
     return res.status(400).json({
