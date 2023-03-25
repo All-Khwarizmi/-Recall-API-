@@ -40,31 +40,6 @@ const recallsScquema = z.object({
 });
 type RecallData = z.infer<typeof recallsScquema>;
 
-// Fetching all user recall plans
-// Synchronizing userName input with user session data
-
-/*  const useFetcher = async () => {
-      const { status, data: session } = useSession();
-      const options = {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: env.NEXT_PUBLIC_API_AUTH_HEADERS_KEY_GET_USER_RECALLS,
-        },
-        body: JSON.stringify({ userId: session?.user.id }),
-      };
-     if (status === "loading") {
-    
-     } else {
-       const response = await fetch("http://localhost:3000/api/getUserRecalls", options)
-       const data: RecallData = await response.json();
-       console.log(data)
-      return data 
-         
-     }
-  }
-const data = useFetcher() */
-
 const Recalls: NextPage = () => {
   const [fetchedData, setFetchedData] = useState<any>();
   const [isLoading, setIsLoadging] = useState<boolean>();
@@ -86,21 +61,12 @@ const Recalls: NextPage = () => {
     body: JSON.stringify({ userId: session?.user.id }),
   };
 
-  /*  const fetcher = (url: string, options: RequestInit) =>  fetch(url, options)
-    .then((response) => {
-      console.log("Response", response);
-      return response.json();
-    })
-    .then((data: RecallData) => {
-      console.log("Data", data);
-      return data;
-    });
-  const { data, error } = useSWR("/api/getUserRecalls", fetcher); */
-
+  // Fetching all user recalls
   useEffect(() => {
     if (status === "loading") {
       setIsLoadging(true);
     } else {
+      
       const data = fetch(env.NEXT_PUBLIC_API_GET_USER_RECALLS_ENDPOINT, options)
         .then((response) => {
           console.log("Response", response);
@@ -149,7 +115,7 @@ const Recalls: NextPage = () => {
                 href={`/addRecall`}
                 className="rounded-full bg-white/10 px-10 py-3 font-semibold text-white no-underline transition hover:bg-white/20"
               >
-                Add recall
+                Add 
               </Link>
             </div>
             <div className="flex items-center justify-end">
@@ -166,19 +132,19 @@ const Recalls: NextPage = () => {
           </div>
         </section>
         <section className="flex h-full w-full ">
-          <div className="grid h-full w-full grid-cols-1 place-items-center gap-4  md:grid-cols-4 md:gap-5">
+          <div className="flex flex-col h-full px-2 w-full place-items-center gap-4 pb-5 md:grid-cols-4 md:gap-5">
             {fetchedData.recall.map((recall: any) => {
               return (
                 <div
                   key={Math.floor(Math.random() * 1000)}
-                  className="flex flex-col gap-4 rounded-xl bg-white/10 p-6 text-white
+                  className="flex flex-col w-full gap-4 px-4 rounded-xl bg-white/10 p-6 text-white
             hover:bg-white/20 lg:max-w-lg"
                 >
                   <p className="text-3xl">{recall.topicName}</p>
                   <p className="italic text-gray-400">
-                    Next recall in{" "}
+                    
                     {differenceInDays(new Date(recall.nextRecall), new Date())}{" "}
-                    days
+                    days from now
                   </p>
                 </div>
               );

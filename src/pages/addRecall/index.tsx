@@ -6,7 +6,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import Header from "~/components/Header";
 import { env } from "~/env.mjs";
 import { calendar } from "lib/helpers";
-import {CgSpinner} from "react-icons/cg"
+import { CgSpinner } from "react-icons/cg";
 
 const AddRecall: NextPage = () => {
   // Checking if user is authenticated, redirecting otherwise
@@ -58,7 +58,7 @@ const AddRecall: NextPage = () => {
       <>
         <Header />
         <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#005a80] to-[#0d003d] text-slate-100">
-      <CgSpinner  className="animate-spin text-7xl"/>
+          <CgSpinner className="animate-spin text-7xl" />
         </main>
       </>
     );
@@ -94,7 +94,9 @@ const AddRecall: NextPage = () => {
           setBotUrl("");
           setUserName("");
         } else if (response.status === 208) {
-          window.alert("Recall already in database. Please choose another topic name");
+          window.alert(
+            "Recall already in database. Please choose another topic name"
+          );
         }
         return response.json();
       })
@@ -108,10 +110,22 @@ const AddRecall: NextPage = () => {
   return (
     <>
       <Header />
-      <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#005a80] to-[#0d003d] text-slate-100">
-        <section>
-          <form className="flex flex-col">
-            <label htmlFor="topic" className="pb-2 uppercase tracking-wider">
+      <main className="flex min-h-screen flex-col items-center justify-start bg-gradient-to-b from-[#005a80] to-[#0d003d] text-slate-100">
+        <section className="h-full w-[90%] pt-10 md:w-[60%]">
+          <h1
+            className="pb-3 text-5xl font-bold  
+  first-letter:text-7xl first-letter:font-bold first-letter:text-white
+  first-line:uppercase first-line:tracking-widest"
+          >
+            {" "}
+            Recal
+          </h1>
+        
+          <form className="flex flex-col pt-5 md:pt-10">
+            <label
+              htmlFor="topic"
+              className="w-[80%] pb-2 uppercase tracking-wider"
+            >
               Your name
             </label>
             <input
@@ -155,7 +169,7 @@ const AddRecall: NextPage = () => {
               className="grow  rounded-lg border border-gray-600 bg-transparent py-1 px-2 tracking-wide ring-slate-300 focus:outline-slate-300"
               placeholder="https://discord.com/api/webhooks/1088529850555433010/IDMlYPu"
             />
-            <div className="p-3"></div>
+            <div className="p-5"></div>
 
             <button
               type="submit"

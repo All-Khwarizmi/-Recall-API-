@@ -60,9 +60,18 @@ const Tryout = () => {
   return (
     <>
       <Header />
-      <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#005a80] to-[#0d003d] text-slate-100">
-        <section>
-          <form className="flex flex-col">
+      <main className="flex min-h-screen flex-col items-center justify-start bg-gradient-to-b from-[#005a80] to-[#0d003d] text-slate-100">
+        <section className="h-full pt-10 w-[90%] md:w-[60%]">
+          <h1
+            className="pb-3 text-5xl font-bold  
+  first-letter:text-7xl first-letter:font-bold first-letter:text-white
+  first-line:uppercase first-line:tracking-widest"
+          >
+            {" "}
+            Recal
+          </h1>
+          
+          <form className="flex flex-col md:pt-10 pt-5">
             <label htmlFor="topic" className="pb-2 uppercase tracking-wider">
               Your name
             </label>
@@ -109,7 +118,7 @@ const Tryout = () => {
               placeholder="https://discord.com/api/webhooks/1088529850555433010/IDMlYPu"
             />
 
-            <div className="p-3"></div>
+            <div className="p-5"></div>
             <button
               type="submit"
               className="rounded-full bg-white/10 px-10 py-3 font-semibold text-white no-underline transition hover:bg-white/20"
