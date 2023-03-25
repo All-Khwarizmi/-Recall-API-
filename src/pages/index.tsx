@@ -12,7 +12,7 @@ const Home: NextPage = () => {
 
   return (
     <>
-     <Header />
+      <Header />
       <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#005a80] to-[#0d003d] text-slate-100">
         <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16 ">
           <h1 className="text-5xl font-extrabold tracking-tight text-white sm:text-[5rem]">
@@ -40,14 +40,14 @@ const Home: NextPage = () => {
             <AuthShowcase />
             {sessionData?.user ? (
               <Link
-                href={"./recalls"}
+                href={"/recalls"}
                 className="rounded-full bg-white/10 px-10 py-3 font-semibold text-white no-underline transition hover:bg-white/20"
               >
                 Enter
               </Link>
             ) : (
               <Link
-                href={"./tryout"}
+                href={"/tryout"}
                 className="rounded-full bg-white/10 px-10 py-3 font-semibold text-white no-underline transition hover:bg-white/20"
               >
                 Tryout
