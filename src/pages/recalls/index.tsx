@@ -40,11 +40,10 @@ const recallsScquema = z.object({
 });
 type RecallData = z.infer<typeof recallsScquema>;
 
- // Fetching all user recall plans
-  // Synchronizing userName input with user session data
+// Fetching all user recall plans
+// Synchronizing userName input with user session data
 
-
- /*  const useFetcher = async () => {
+/*  const useFetcher = async () => {
       const { status, data: session } = useSession();
       const options = {
         method: "POST",
@@ -78,16 +77,16 @@ const Recalls: NextPage = () => {
       router.back();
     },
   });
-    const options = {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: env.NEXT_PUBLIC_API_AUTH_HEADERS_KEY_GET_USER_RECALLS,
-      },
-      body: JSON.stringify({ userId: session?.user.id }),
-    };
-   const  url = "http://localhost:3000/api/getUserRecalls"
- /*  const fetcher = (url: string, options: RequestInit) =>  fetch(url, options)
+  const options = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: env.NEXT_PUBLIC_API_AUTH_HEADERS_KEY_GET_USER_RECALLS,
+    },
+    body: JSON.stringify({ userId: session?.user.id }),
+  };
+
+  /*  const fetcher = (url: string, options: RequestInit) =>  fetch(url, options)
     .then((response) => {
       console.log("Response", response);
       return response.json();
@@ -97,13 +96,12 @@ const Recalls: NextPage = () => {
       return data;
     });
   const { data, error } = useSWR("/api/getUserRecalls", fetcher); */
-   
- 
+
   useEffect(() => {
     if (status === "loading") {
       setIsLoadging(true);
     } else {
-      const data = fetch("http://localhost:3000/api/getUserRecalls", options)
+      const data = fetch(env.NEXT_PUBLIC_API_GET_USER_RECALLS_ENDPOINT, options)
         .then((response) => {
           console.log("Response", response);
           return response.json();
@@ -111,20 +109,15 @@ const Recalls: NextPage = () => {
         .then((data) => {
           console.log("Data", data);
           const typedData = recallsScquema.safeParse(data);
-          setFetchedData(data)
+          setFetchedData(data);
           console.log("typeddata", typedData);
           return data;
         })
         .catch((error) => {
           console.log(error);
         });
-     
-      
     }
   }, [status]);
- 
-  // console.log(fetchedData);
-  console.log(env.NEXT_PUBLIC_API_GET_USER_RECALLS_ENDPOINT);
 
   if (status === "loading" || !fetchedData?.recall) {
     return (
@@ -159,7 +152,7 @@ const Recalls: NextPage = () => {
                 Add recall
               </Link>
             </div>
-            <div className="flex justify-end items-center">
+            <div className="flex items-center justify-end">
               <div>
                 <Image
                   src={`${session.user.image}`}
@@ -178,8 +171,8 @@ const Recalls: NextPage = () => {
               return (
                 <div
                   key={Math.floor(Math.random() * 1000)}
-                  className="flex lg:max-w-lg flex-col gap-4 rounded-xl bg-white/10 p-6
-            text-white hover:bg-white/20"
+                  className="flex flex-col gap-4 rounded-xl bg-white/10 p-6 text-white
+            hover:bg-white/20 lg:max-w-lg"
                 >
                   <p className="text-3xl">{recall.topicName}</p>
                   <p className="italic text-gray-400">
