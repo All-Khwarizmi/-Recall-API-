@@ -182,7 +182,7 @@ const Recalls: NextPage = () => {
   const handleHelp = () => {
     alert("TODO");
   };
-  if (status === "loading" || (!fetchedData?.recall && !isDataButNotRecall)) {
+/*   if (status === "loading" || (!fetchedData?.recall && !isDataButNotRecall)) {
     return (
       <>
         <Header />
@@ -205,7 +205,7 @@ const Recalls: NextPage = () => {
         </main>
       </>
     );
-  }
+  } */
 
   return (
     <>
