@@ -73,9 +73,8 @@ const Recalls: NextPage = () => {
     if (status === "loading") {
       setIsLoading(true);
     } else {
-      // "http://localhost:3000/api/getUserRecalls"
-      // env.NEXT_PUBLIC_API_GET_USER_RECALLS_ENDPOINT
-      const data = fetch("http://localhost:3000/api/getUserRecalls", options)
+      
+      const data = fetch(env.NEXT_PUBLIC_API_GET_USER_RECALLS_ENDPOINT, options)
         .then((response) => {
           console.log("Response", response);
           return response.json();
@@ -235,11 +234,12 @@ const Recalls: NextPage = () => {
                 onClick={handleHelp}
                 className="rounded-full bg-white/10 px-5 py-3 font-semibold uppercase text-white no-underline transition hover:bg-white/20 md:px-10"
               >
-                help me
+                help 
               </button>
             </div>
             <div className="flex items-center justify-end">
-              <div>
+            {session?.user.image ? (
+                <div>
                 <Image
                   src={`${session?.user.image}`}
                   width={40}
@@ -248,6 +248,7 @@ const Recalls: NextPage = () => {
                   className="rounded-full"
                 />
               </div>
+            ): null}
             </div>
           </div>
         </section>
