@@ -37,6 +37,8 @@ const server = z.object({
   API_AUTH_HEADERS_SEND_MSG: z.string(),
   API_RECALL_OF_THE_DAY_ENDPOINT: z.string(),
   API_AUTH_HEADERS_TRY_RECALL: z.string(),
+  GOOGLE_CLIENT_SECRET: z.string(),
+  GOOGLE_CLIENT_ID: z.string(),
 });
 
 /**
@@ -70,7 +72,9 @@ const processEnv = {
   NODE_ENV: process.env.NODE_ENV,
   NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
   NEXTAUTH_URL: process.env.NEXTAUTH_URL,
+  GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
   DISCORD_CLIENT_ID: process.env.DISCORD_CLIENT_ID,
+  GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
   DISCORD_CLIENT_SECRET: process.env.DISCORD_CLIENT_SECRET,
   REDIS_URL: process.env.REDIS_URL,
   API_AUTH_HEADERS_KEY_TEST: process.env.API_AUTH_HEADERS_KEY_TEST,
