@@ -8,6 +8,7 @@ import addDays from "date-fns/addDays";
 import { requestMethodChecker } from "lib/requestMethodChecker";
 
 export const recallSchema = new Schema("recall", {
+
   topicName: { type: "string" },
   userId: { type: "string" },
   userEmail: { type: "string" },
@@ -15,6 +16,7 @@ export const recallSchema = new Schema("recall", {
   userName: { type: "string" },
   lastRecall: { type: "date" },
   nextRecall: { type: "date" },
+  nextRecallName: { type: "string" },
   calendar: { type: "string[]" },
   discordBotUrl: { type: "string" },
 });
@@ -30,6 +32,7 @@ const addRecallSchema = z.object({
   userName: z.string(),
   lastRecall: z.date(),
   nextRecall: z.date(),
+  nextRecallName: z.string(),
   calendar: z.object({
     recallOne: z.string(),
     recallTwo: z.string(),
@@ -74,6 +77,7 @@ export default async function handler<NextApiHandler>(
     botUrl: req.body.botUrl,
     lastRecall: new Date(req.body.lastRecall),
     nextRecall: new Date(req.body.nextRecall),
+    nextRecallName: req.body.nextRecallName,
     calendar: req.body.calendar
   };
  // console.log(requestData);

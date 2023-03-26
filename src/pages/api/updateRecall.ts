@@ -39,7 +39,8 @@ function runMiddleware(
 // Zod validation
 const deleteRecallRequestSchema = z.object({
   userId: z.string(),
-  name: z.string(),
+  topicName: z.string(),
+  nextRecallName: z.string(),
   nextRecall: z.date(),
 });
 type DeleteRecall = z.infer<typeof deleteRecallRequestSchema>;
@@ -87,8 +88,8 @@ export default async function handler(
       .search()
       .where("userId")
       .eq(`${parsedRequestData.data.userId}`)
-      .and("name")
-      .eq(`${parsedRequestData.data.name}`)
+      .and("topicName")
+      .eq(`${parsedRequestData.data.topicName}`)
       .return.firstId();
     if (!recall?.length) {
       // Deconnecting from redis client
@@ -98,9 +99,11 @@ export default async function handler(
 
     // Fetching recall to update it
     const oldRecall = await recallRepository.fetch(recall);
-    console.log(oldRecall);
+    console.log("Old oldRecall", oldRecall);
     oldRecall.nextRecall = requestData.nextRecall;
-
+    oldRecall.nextRecallName = requestData.nextRecallName;
+    oldRecall.lastRecall = new Date()
+    console.log("New oldRecall", oldRecall);
     // Saving recall plan to DB and since it already exist that updates it
     const recallUpdated = await recallRepository.save(oldRecall);
 

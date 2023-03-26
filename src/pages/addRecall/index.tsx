@@ -7,6 +7,7 @@ import Header from "~/components/Header";
 import { env } from "~/env.mjs";
 import { calendar } from "lib/helpers";
 import { CgSpinner } from "react-icons/cg";
+import Link from "next/link";
 
 const AddRecall: NextPage = () => {
   // Checking if user is authenticated, redirecting otherwise
@@ -39,6 +40,7 @@ const AddRecall: NextPage = () => {
         userImage: session?.user.image,
         calendar: newCalendar,
         lastRecall: new Date(),
+        nextRecallName: 'recallOne',
         nextRecall: new Date(newCalendar.recallOne),
       }),
     };
@@ -112,15 +114,24 @@ const AddRecall: NextPage = () => {
       <Header />
       <main className="flex min-h-screen flex-col items-center justify-start bg-gradient-to-b from-[#005a80] to-[#0d003d] text-slate-100">
         <section className="h-full w-[90%] pt-10 md:w-[60%]">
-          <h1
-            className="pb-3 text-5xl font-bold  
+          <div className="flex gap-3">
+            <h1
+              className="pb-3 text-5xl font-bold  
   first-letter:text-7xl first-letter:font-bold first-letter:text-white
   first-line:uppercase first-line:tracking-widest"
-          >
-            {" "}
-            Recal
-          </h1>
-        
+            >
+              {" "}
+              Recal
+            </h1>
+            <div className="flex items-center justify-center">
+              <Link
+                href={`/recalls`}
+                className="rounded-full bg-white/10 px-10 py-3 font-semibold text-white no-underline transition hover:bg-white/20"
+              >
+               Dashboard
+              </Link>
+            </div>
+          </div>
           <form className="flex flex-col pt-5 md:pt-10">
             <label
               htmlFor="topic"

@@ -7,7 +7,7 @@ import { z } from "zod";
 import addDays from "date-fns/addDays";
 
 const recallSchema = new Schema("recall", {
-  name: { type: "string" },
+  topicName: { type: "string" },
   userId: { type: "string" },
   userEmail: { type: "string" },
   userImage: { type: "string" },
@@ -21,7 +21,7 @@ export const recallRepository = new Repository(recallSchema, client);
 
 // creating a zod validation schema for recall incoming request
 const addRecallSchema = z.object({
-  name: z.string(),
+  topicName: z.string(),
   userId: z.string(),
   userEmail: z.string().email(),
   userImage: z.string(),
@@ -46,7 +46,7 @@ export default async function handler<NextApiHandler>(
   // Validating recall body with zod and typescript
 
   const requestData: AddRecall = {
-    name: req.body.name,
+    topicName: req.body.topicNname,
     userEmail: req.body.userEmail,
     userId: req.body.userId,
     userImage: req.body.userImage,

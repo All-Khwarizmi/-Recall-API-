@@ -40,7 +40,7 @@ function runMiddleware(
 // Zod validation
 const deleteRecallRequestSchema = z.object({
   userId: z.string(),
-  name: z.string(),
+  topicName: z.string(),
 });
 
 export default async function handler(
@@ -80,8 +80,8 @@ export default async function handler(
       .search()
       .where("userId")
       .eq(`${parsedRequestData.data.userId}`)
-      .and("name")
-      .eq(`${parsedRequestData.data.name}`)
+      .and("topicName")
+      .eq(`${parsedRequestData.data.topicName}`)
       .return.firstId();
     if (!recall?.length) {
       // Deconnecting from redis client
