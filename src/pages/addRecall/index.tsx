@@ -114,7 +114,7 @@ const AddRecall: NextPage = () => {
       <Header />
       <main className="flex min-h-screen flex-col items-center justify-start bg-gradient-to-b from-[#005a80] to-[#0d003d] text-slate-100">
         <section className="h-full w-[90%] pt-10 md:w-[60%]">
-          <div className="flex gap-3">
+          <div className="flex gap-4">
             <h1
               className="pb-3 text-5xl font-bold  
   first-letter:text-7xl first-letter:font-bold first-letter:text-white
@@ -123,10 +123,10 @@ const AddRecall: NextPage = () => {
               {" "}
               Recal
             </h1>
-            <div className="flex items-center justify-center">
+            <div className="flex w-full items-center justify-end">
               <Link
                 href={`/recalls`}
-                className="rounded-full bg-white/10 px-10 py-3 font-semibold text-white no-underline transition hover:bg-white/20"
+                className="rounded-full bg-white/10 px-5 md:px-10 py-3 font-semibold text-white no-underline transition hover:bg-white/20"
               >
                Dashboard
               </Link>

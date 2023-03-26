@@ -4,15 +4,13 @@ import { type NextPage } from "next";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { CgSpinner } from "react-icons/cg";
 import { env } from "~/env.mjs";
-import Image from "next/image";
 import { z } from "zod";
 import { whatRecallDay, getNextRecallDay } from "lib/whatRecallDay";
-
 import differenceInDays from "date-fns/differenceInDays";
 import { Calendar } from "lib/helpers";
 
+// Zod schema 
 const recallsScquema = z.object({
   msg: z.string(),
   recall: z.array(
@@ -181,6 +179,8 @@ const Recalls: NextPage = () => {
   const handleHelp = () => {
     alert("TODO");
   };
+  // TODO 
+    // Check whats wrong with the logic it keept spinning on new user. Is that because of fetching problem we had and now its ok ? Should check with a new user...
 /*   if (status === "loading" || (!fetchedData?.recall && !isDataButNotRecall)) {
     return (
       <>
@@ -211,7 +211,7 @@ const Recalls: NextPage = () => {
       <Header />
       <main className="flex min-h-screen flex-col items-center  bg-gradient-to-b from-[#005a80] to-[#0d003d] text-slate-100">
         <section className="intems-start flex h-full w-full">
-          <div className="flex flex-row gap-5 p-5 md:p-10">
+          <div className="flex flex-row gap-5 md:gap-7 p-5 md:p-10">
             <h1
               className="pb-2 font-bold first-letter:text-7xl  
   first-letter:font-bold first-letter:text-white first-line:uppercase
