@@ -241,7 +241,7 @@ const Recalls: NextPage = () => {
             <div className="flex items-center justify-end">
               <div>
                 <Image
-                  src={`${session.user.image}`}
+                  src={`${session?.user.image}`}
                   width={40}
                   height={40}
                   alt="user image"
