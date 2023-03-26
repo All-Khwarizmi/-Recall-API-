@@ -1,12 +1,10 @@
-import { NextApiRequest, NextApiResponse, NextApiHandler } from "next";
+import { NextApiRequest, NextApiResponse } from "next";
 import { client } from "lib/redis";
 import { env } from "~/env.mjs";
-import { prisma } from "~/server/db";
 import { Schema, Repository } from "redis-om";
 import { z } from "zod";
-import addDays from "date-fns/addDays";
-import { requestMethodChecker } from "lib/requestMethodChecker";
 
+// Creating Redis schema
 export const recallSchema = new Schema("recall", {
 
   topicName: { type: "string" },
@@ -47,6 +45,8 @@ const addRecallSchema = z.object({
   }),
   botUrl: z.string(),
 });
+
+// Infering typescript type from zod schema
 export type AddRecall = z.infer<typeof addRecallSchema>;
 export type DayDate = Date;
 

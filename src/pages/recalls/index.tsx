@@ -241,7 +241,7 @@ const Recalls: NextPage = () => {
             {session?.user.image ? (
                 <div>
                 <img
-                  src={`${session?.user.image}`}
+                  src={`${session.user.image}`}
                   width={40}
                   height={40}
                   alt="user image"
