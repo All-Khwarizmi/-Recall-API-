@@ -24,7 +24,7 @@ If that sounds interesting to you, have a look on the following options you have
 # Table of contents
 
 - [🎛️ Recal GUI](./documentation/1-Recal-GUI/recal-gui.md)
-- [𐄳 Recal API](./documentation/1-Recal-API/recal-api.md)
+- [𐄳 Recal API](./documentation/2-Recal-API/recal-api.md)
 - [🧠 The science behind Recal](./documentation/3-The-science-behind-Recal/The-science-behind-Recal.md)
 - [💬 Recall under the hood](./documentation/4-Recal-under-the-hood/Recal-under-the-hood.md)
 - [🥶 Codice](./documentation/5-Codice/codice.md)
