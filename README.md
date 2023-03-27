@@ -24,9 +24,10 @@ If that sounds interesting to you, have a look on the following options you have
 # Table of contents
 
 - [🎛️ Recal GUI](./documentation/1-Recal-GUI/recal-gui.md)
+- [🥶 Codice](https://github.com/All-Khwarizmi/codice)
+- [🧠 QuizoO](https://github.com/All-Khwarizmi/Quiz-Sanity)
 - [𐄳 Recal API](./documentation/2-Recal-API/recal-api.md)
 - [🔬 The science behind Recal](./documentation/3-The-science-behind-Recal/The-science-behind-recal.md)
 - [💬 Recall under the hood](./documentation/4-Recal-under-the-hood/recal-unde-the-hood.md)
-- [🥶 Codice](https://github.com/All-Khwarizmi/codice)
-- [🧠 QuizoO](https://github.com/All-Khwarizmi/Quiz-Sanity)
+
   
