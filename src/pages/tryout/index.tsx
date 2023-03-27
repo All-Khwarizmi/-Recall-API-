@@ -20,8 +20,10 @@ const Tryout = () => {
 
   const handleSubmit = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
-    if (!botUrl.startsWith("https://")) {
-      return alert("Please be sure to enter a valid url");
+    if (!botUrl.startsWith("https://") || topic.length < 2) {
+      return alert(
+        "Please be sure to enter a valid url and valid topic name, minimum two characters long!"
+      );
     }
 
     const options = {
