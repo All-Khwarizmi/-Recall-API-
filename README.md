@@ -17,9 +17,9 @@ Many offer great tools to memorize applying this principles, but none provide yo
 Indeed our value is to tell you when and what to study so that you can spend more time actually learning and not building sofistaced study sessions plannings that more often than not wont last long. 
 
 If that sounds interesting to you, have a look on the following options you have: 
-- Recal GUI is most simple yet powerfull application of all the suite we offer. You add a topic and a messaging bot url we will send you a message when it's time to study any give topic.
+- Recal GUI is the most simple yet powerfull application. You add a topic and a messaging bot url, then we will send you a message when it's time to study any given topic.
 - Codice is a flashcard based web application that will prepare you to ice your code interviews. Codeice benefit from the Recal API that notifies you when it's time to study.
-- QuizoO is a pop quiz based web application created for students learning spanish. The application tell them when it's the right time to study whichever their teacher have decided to focus on. And if they do so they get points. That's a double win for them and a bin win for him
+- QuizoO is a pop quiz based web application created for students learning spanish. The application tell them when it's the right time to study whichever their teacher have decided to put the focus on. And if they do so, they get points. That's a double win for them and a big win for him
 
 # Table of contents
 
