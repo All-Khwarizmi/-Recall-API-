@@ -1,4 +1,3 @@
-
 import { NextPage } from "next";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
@@ -40,7 +39,7 @@ const AddRecall: NextPage = () => {
         userImage: session?.user.image,
         calendar: newCalendar,
         lastRecall: new Date(),
-        nextRecallName: 'recallOne',
+        nextRecallName: "recallOne",
         nextRecall: new Date(newCalendar.recallOne),
       }),
     };
@@ -77,7 +76,9 @@ const AddRecall: NextPage = () => {
   const handleSubmit = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
     if (!botUrl.startsWith("https://") || topic.length < 2) {
-      return alert("Please be sure to enter a valid url and valid topic name, minimum two characters long!");
+      return alert(
+        "Please be sure to enter a valid url and valid topic name, minimum two characters long!"
+      );
     }
 
     console.log(JSON.parse(options.body));
@@ -94,7 +95,6 @@ const AddRecall: NextPage = () => {
           );
           setTopic("");
           setBotUrl("");
-          setUserName("");
         } else if (response.status === 208) {
           window.alert(
             "Recall already in database. Please choose another topic name"
@@ -126,9 +126,9 @@ const AddRecall: NextPage = () => {
             <div className="flex w-full items-center justify-end">
               <Link
                 href={`/recalls`}
-                className="rounded-full bg-white/10 px-5 md:px-10 py-3 font-semibold text-white no-underline transition hover:bg-white/20"
+                className="rounded-full bg-white/10 px-5 py-3 font-semibold text-white no-underline transition hover:bg-white/20 md:px-10"
               >
-               Dashboard
+                Dashboard
               </Link>
             </div>
           </div>
