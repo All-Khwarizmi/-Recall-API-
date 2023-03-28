@@ -54,7 +54,7 @@ export const sm2: Sm2 = (quality, interval, repetitions, easeFactor) => {
   let newInterval = interval;
   let newRepetitions = repetitions;
   let newEaseFactor = easeFactor;
-  let newEaseQuality = quality;
+
 
   // Rest of the algo logic
   // Case 1: correct answer
@@ -68,12 +68,12 @@ export const sm2: Sm2 = (quality, interval, repetitions, easeFactor) => {
     }
 
     // Increment repetitions
-    repetitions += 1;
-    
+    newRepetitions += 1;
+
   } else {
     // Case 2: incorrect answer
-    repetitions = 0;
-    interval = 1;
+    newRepetitions = 0;
+    newInterval = 1;
   }
 
   // Calculate new ease factor
