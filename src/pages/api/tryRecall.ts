@@ -2,7 +2,6 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import Cors from "cors";
 import { env } from "~/env.mjs";
 import { z } from "zod";
-import axios from "axios";
 import { calendar } from "lib/helpers";
 
 type MiddlewareFnCallbackFn = (result: unknown) => unknown;

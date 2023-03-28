@@ -77,8 +77,8 @@ export default async function handler(
     return {
       userName: item.userName,
       userId: item.userId,
-      discordBotUrl: item.discordBotUrl,
-      name: item.name,
+      botUrl: item.botUrl,
+      topicName: item.topicName,
     };
   })
   res.json({ msg: "Here are all the recalls of today", recallObj });

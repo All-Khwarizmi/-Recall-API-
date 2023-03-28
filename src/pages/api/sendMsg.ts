@@ -42,7 +42,7 @@ const recallsOfTodaySchema = z.object({
       userName: z.string(),
       userId: z.string(),
       botUrl: z.string(),
-      name: z.string(),
+      topicName: z.string(),
     })
   ),
 });
@@ -81,7 +81,6 @@ export default async function handler(
     const parsedRecallsOfToday = recallsOfTodaySchema.safeParse(recallsOfToday);
     console.log("In sendMsg", parsedRecallsOfToday);
 
-
     /* *
      * Helper function to parse incoming data containing the recall plans of today.
      * @function
@@ -102,15 +101,15 @@ export default async function handler(
           if (filterObj.has(data.recallObj[a]!.userId)) {
             // If so add the topic to the topics array
             newRecallObj[data.recallObj[a]!.userId].topics.push(
-              data.recallObj[a]!.name
+              data.recallObj[a]!.topicName
             );
           } else {
             // If not creates a userId property into the newRecallObj and instantiate it with an object
             if (data.recallObj[a]!.userId) {
               newRecallObj[data.recallObj[a]!.userId] = {
                 name: data.recallObj[a]!.userName,
-                discordBotUrl: data.recallObj[a]!.botUrl,
-                topics: [data.recallObj[a]!.name],
+                botUrl: data.recallObj[a]!.botUrl,
+                topics: [data.recallObj[a]!.topicName],
               };
             }
             // And add the userId to the filterObj helper set
@@ -141,15 +140,18 @@ export default async function handler(
     Hi ${newRecallObj[user].name},
     
 Today you should study the following topics :
+
  ${newRecallObj[user].topics
    .map((item: string) => "- " + item + "\n")
    .join(" ")
    .toString()}
 
-  Happy memorisation.
+Happy memorisation.
 
-  The Recal team
+The Recal team
   `;
+
+        // Creating set of options for discord and slack
         const optionsDiscord = {
           method: "POST",
           headers: {
@@ -179,48 +181,24 @@ Today you should study the following topics :
           })
           .finally(() => {
             console.log("Fetch finished sending messages");
-            res
-              .status(201)
-              .json({ msg: "Here are your user recall plan", newRecallObj });
-            console.log("After sending message into HTTP response");
           });
-
-        /*    const axiosConfigDiscord = {
-          method: "POST",
-          url: newRecallObj[user].discordBotUrl,
-          headers: {
-            "Content-Type": "application/json",
-          },
-          data: JSON.stringify({ content: message }),
-        };
-        const axiosConfigSlack = {
-          method: "POST",
-          url: newRecallObj[user].discordBotUrl,
-          headers: {
-            "Content-Type": "application/json",
-          },
-          data: JSON.stringify({ text: message }),
-        };
-        axios(
-          newRecallObj[user].discordBotUrl.startsWith("https://discord")
-            ? axiosConfigDiscord
-            : axiosConfigSlack
-        )
-          .then(function (response: any) {
-            console.log("Axios", response.status);
-          })
-          .catch(function (error) {
-            console.log("Axios", error);
-          })
-          .finally(function () {
-           console.log("Axios finished sending messages");
-          }); */
+        
       });
+      res
+        .status(201)
+        .json({ msg: "Here are your user recall plan", newRecallObj });
+      console.log("After sending message into HTTP response");
+    } else {
+       res.status(500).json({
+         msg: "We could not send the user recall plans recall plan. Please try again later or open an issue on Github",
+       });
+       console.log("After sending message into HTTP response");
     }
+   
   } catch (error) {
     console.log(error);
     res.status(500).json({
-      msg: "We could not the user recall plans recall plan. Please try again later or open an issue on Github",
+      msg: "We could not send the user recall plans recall plan. Please try again later or open an issue on Github",
       error,
     });
   }
