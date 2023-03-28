@@ -94,7 +94,6 @@ const AddRecall: NextPage = () => {
             "Recall added successfully. Please check your dashboard"
           );
           setTopic("");
-          setBotUrl("");
         } else if (response.status === 208) {
           window.alert(
             "Recall already in database. Please choose another topic name"
