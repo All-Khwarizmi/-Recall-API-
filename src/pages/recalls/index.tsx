@@ -71,8 +71,9 @@ const Recalls: NextPage = () => {
     if (status === "loading") {
       setIsLoading(true);
     } else {
-      
-      const data = fetch(env.NEXT_PUBLIC_API_GET_USER_RECALLS_ENDPOINT, options)
+      // "http://localhost:3000/api/getUserRecalls"
+      // env.NEXT_PUBLIC_API_GET_USER_RECALLS_ENDPOINT
+      const data = fetch("http://localhost:3000/api/getUserRecalls", options)
         .then((response) => {
           console.log("Response", response);
           return response.json();
@@ -117,10 +118,11 @@ const Recalls: NextPage = () => {
       }),
     };
     const isUserSure = confirm("Are you sure?");
-   
+    // "http://localhost:3000/api/deleteRecall";
+    //env.NEXT_PUBLIC_API_DELETE_USER_RECALL_ENDPOINT
     if (isUserSure) {
       console.log("Sure");
-      fetch(env.NEXT_PUBLIC_API_DELETE_USER_RECALL_ENDPOINT, options)
+      fetch("http://localhost:3000/api/deleteRecall", options)
         .then((response) => {
           console.log(response.ok);
           if (response.ok) {
@@ -128,7 +130,7 @@ const Recalls: NextPage = () => {
           }
         })
         .catch((error) => console.log(error));
-    } 
+    }
   };
 
   // Handle update recall
@@ -165,7 +167,7 @@ const Recalls: NextPage = () => {
     if (isUserSure) {
       console.log("Sure");
 
-      fetch(env.NEXT_PUBLIC_API_UPDATE_USER_RECALL_ENDPOINT, options)
+      fetch("http://localhost:3000/api/updateRecall", options)
         .then((response) => {
           console.log(response.ok);
           if (response.ok) {

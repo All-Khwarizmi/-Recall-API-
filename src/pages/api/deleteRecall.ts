@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import Cors from "cors";
 import { client } from "lib/redis";
 import { env } from "~/env.mjs";
-import { recallRepository } from "./test";
+import { recallRepository } from "./addRecall";
 import { z } from "zod";
 
 // Types
@@ -73,7 +73,15 @@ export default async function handler(
   try {
     // Connecting to redis client
     client.on("error", (err) => console.log("Redis Client Error", err));
-    await client.connect();
+    const info = await client.clientInfo().catch((error) => {
+      console.log(error.message);
+      return error.message;
+    });
+    console.log("info", info);
+    if (info === "The client is closed") {
+      await client.connect().catch((error) => console.log(error.message));
+      // Creating recall plan in Redis DB
+    }
 
     // Looking for recallID
     const recall = await recallRepository
@@ -97,7 +105,6 @@ export default async function handler(
 
     // Deconnecting from redis client
     await client.disconnect();
-    
   } catch (error) {
     console.log(error);
     res.status(500).json({
