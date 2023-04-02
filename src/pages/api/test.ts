@@ -38,14 +38,14 @@ export default async function handler<NextApiHandler>(
   res: NextApiResponse
 ) {
   // Checking authorization headers
-  if (req.headers.authorization !== env.API_AUTH_HEADERS_KEY_TEST)
+/*   if (req.headers.authorization !== env.API_AUTH_HEADERS_KEY_TEST)
     return res
       .status(403)
       .json({ msg: "Your authorization header is not valid" });
-
+ */
   // Validating recall body with zod and typescript
 
-  const requestData: AddRecall = {
+/*   const requestData: AddRecall = {
     topicName: req.body.topicNname,
     userEmail: req.body.userEmail,
     userId: req.body.userId,
@@ -58,28 +58,28 @@ export default async function handler<NextApiHandler>(
       console.log(Date.parse(item));
       return item;
     }),
-  };
-
+  }; */
+/* 
   const parsedRequestData = addRecallSchema.safeParse(requestData);
   if (!parsedRequestData.success)
     return res.status(400).json({
       msg: "Please be sure to fill the body of your request with valid data. Refer to API documentation.",
     });
   console.log("parsedRequestData", parsedRequestData);
-
+ */
   // Creating recall plan in Redis DB
 try {
   client.on("error", (err) => console.log("Redis Client Error", err));
   await client.connect();
-  await recallRepository.createIndex()
-  
+  await recallRepository.dropIndex()
+/*   
   const recall = await recallRepository.save(parsedRequestData.data);
   // const requestKey = req.body;
   // const authHeaders = req.headers;
   console.log("parsedRequestData", parsedRequestData);
   console.log("recall", recall);
-
-  res.status(200).json({ name: `Setting key status = ${recall}` });
+ */
+  res.status(200).json({ name: `Setting key status = ` });
 } catch (error) {
   console.log(error);
   res

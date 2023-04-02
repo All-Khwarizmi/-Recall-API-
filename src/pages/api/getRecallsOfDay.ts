@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import Cors from "cors";
 import { client } from "lib/redis";
 import { env } from "~/env.mjs";
-import { recallRepository } from "./test";
+import { recallRepository } from "./addRecall";
 import { addDays } from "date-fns";
 
 // Types

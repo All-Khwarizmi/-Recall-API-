@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import Cors from "cors";
 import { client } from "lib/redis";
 import { env } from "~/env.mjs";
-import { recallRepository } from "./test";
+import { recallRepository } from "./addRecall";
 
 // Types 
 type MiddlewareFnCallbackFn = (result: unknown) => unknown;
@@ -60,7 +60,12 @@ export default async function handler(
 
   // Connecting to redis client
   client.on("error", (err) => console.log("Redis Client Error", err));
+  console.log("client info before", client.info)
   await client.connect();
+  const info = await client.info()
+   console.log("client info after", info);
+  // Creating recall plan in Redis DB
+  await recallRepository.createIndex();
 
   const recall = await recallRepository.search().return.all();
 

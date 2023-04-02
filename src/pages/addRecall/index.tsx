@@ -13,9 +13,7 @@ const AddRecall: NextPage = () => {
   const router = useRouter();
   const { status, data: session } = useSession({
     required: true,
-    onUnauthenticated() {
-      router.back();
-    },
+ 
   });
 
   const [userName, setUserName] = useState<string>("");

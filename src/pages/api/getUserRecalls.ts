@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import Cors from "cors";
 import { client } from "lib/redis";
 import { env } from "~/env.mjs";
-import { recallRepository } from "./test";
+import { recallRepository } from "./addRecall";
 import { z } from "zod";
 
 type MiddlewareFnCallbackFn = (result: unknown) => unknown;
@@ -69,10 +69,16 @@ console.log(req.body)
     });
 
   try {
-    // Connecting to redis client
-    client.on("error", (err) => console.log("Redis Client Error", err));
-    await client.connect();
-
+      client.on("error", (err) => console.log("Redis Client Error", err));
+      const info = await client.clientInfo().catch((error) => {
+        console.log(error.message);
+        return error.message;
+      });
+      console.log("info", info);
+      if (info === "The client is closed") {
+        await client.connect().catch((error) => console.log(error.message));
+        // Creating recall plan in Redis DB
+      }
     const recall = await recallRepository
       .search()
       .where("userId")
@@ -80,13 +86,11 @@ console.log(req.body)
       .return.all();
     console.log(recall);
     if (!recall.length) {
-      // Deconnecting from redis client
-      await client.disconnect();
+     
       return res.json({ message: "No recall in database" });
     }
 
-    // Deconnecting from redis client
-    await client.disconnect();
+
     res.json({ msg: "Here are your user recall plans", recall });
   } catch (error) {
     console.log(error);

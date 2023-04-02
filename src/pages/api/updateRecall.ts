@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import Cors from "cors";
 import { client } from "lib/redis";
 import { env } from "~/env.mjs";
-import { recallRepository } from "./test";
+import { recallRepository } from "./addRecall";
 import { z } from "zod";
 
 // Types
@@ -37,13 +37,20 @@ function runMiddleware(
 }
 
 // Zod validation
-const deleteRecallRequestSchema = z.object({
+const updateRecallRequestSchema = z.object({
   userId: z.string(),
   topicName: z.string(),
+  questionName: z.string(),
   nextRecallName: z.string(),
   nextRecall: z.date(),
+  interval: z.number(),
+  repetitions: z.number(),
+  easeFactor: z.number(),
+  quality: z.number(),
+  score: z.array(z.string()),
+  studySessions: z.array(z.string()),
 });
-type DeleteRecall = z.infer<typeof deleteRecallRequestSchema>;
+type updateRecall = z.infer<typeof updateRecallRequestSchema>;
 
 export default async function handler(
   req: NextApiRequest,
@@ -67,11 +74,13 @@ export default async function handler(
       .json({ msg: "Your authorization header is not valid" });
 
   // Checking if request body is valid
-  const requestData: DeleteRecall = { ...req.body };
+  const requestData: updateRecall = { ...req.body };
   requestData.nextRecall = new Date(requestData.nextRecall);
-  console.log("request Data", requestData);
-  const parsedRequestData = deleteRecallRequestSchema.safeParse(requestData);
-  console.log(parsedRequestData);
+  // console.log("request Data", requestData);
+  const parsedRequestData = updateRecallRequestSchema.safeParse(requestData);
+  // console.log(parsedRequestData);
+  const parsedRequestDataParse = updateRecallRequestSchema.parse(requestData);
+  // console.log(parsedRequestDataParse);
   if (!parsedRequestData.success) {
     return res.status(400).json({
       msg: "Please be sure to fill the body of your request with valid data. Refer to API documentation.",
@@ -81,8 +90,15 @@ export default async function handler(
   try {
     // Connecting to redis client
     client.on("error", (err) => console.log("Redis Client Error", err));
-    await client.connect();
-
+      const info = await client.clientInfo().catch((error) => {
+        console.log(error.message);
+        return error.message;
+      });
+      console.log("info", info);
+      if (info === "The client is closed") {
+        await client.connect().catch((error) => console.log(error.message));
+        // Creating recall plan in Redis DB
+      }
     // Looking for recallID
     const recall = await recallRepository
       .search()
@@ -90,7 +106,10 @@ export default async function handler(
       .eq(`${parsedRequestData.data.userId}`)
       .and("topicName")
       .eq(`${parsedRequestData.data.topicName}`)
+      .and("questionName")
+      .eq(`${parsedRequestData.data.questionName}`)
       .return.firstId();
+    console.log("recall", recall);
     if (!recall?.length) {
       // Deconnecting from redis client
       await client.disconnect();
@@ -100,10 +119,20 @@ export default async function handler(
     // Fetching recall to update it
     const oldRecall = await recallRepository.fetch(recall);
     console.log("Old oldRecall", oldRecall);
+
+    // Updating fields
     oldRecall.nextRecall = requestData.nextRecall;
     oldRecall.nextRecallName = requestData.nextRecallName;
-    oldRecall.lastRecall = new Date()
+    oldRecall.lastRecall = new Date();
+    oldRecall.interval = requestData.interval;
+    oldRecall.repetitions = requestData.repetitions;
+    oldRecall.easeFactor = requestData.easeFactor;
+    oldRecall.quality = requestData.quality;
+    oldRecall.score = requestData.score;
+    oldRecall.studySessions = requestData.studySessions;
+
     console.log("New oldRecall", oldRecall);
+
     // Saving recall plan to DB and since it already exist that updates it
     const recallUpdated = await recallRepository.save(oldRecall);
 
@@ -112,8 +141,7 @@ export default async function handler(
       recallUpdated,
     });
 
-    // Deconnecting from redis client
-    await client.disconnect();
+   
   } catch (error) {
     console.log(error);
     res.status(500).json({

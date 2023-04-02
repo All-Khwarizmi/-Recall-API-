@@ -2,9 +2,11 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import Cors from "cors";
 import { client } from "lib/redis";
 import { env } from "~/env.mjs";
-import { recallRepository } from "./test";
+import { recallRepository } from "./addRecall";
 import { z } from "zod";
 
+// Connecting to redis client
+client.on("error", (err) => console.log("Redis Client Error", err));
 type MiddlewareFnCallbackFn = (result: unknown) => unknown;
 type MiddlewareFn = (
   req: NextApiRequest,
@@ -37,7 +39,7 @@ function runMiddleware(
 // Zod validation
 const userRecallRequestSchema = z.object({
   userId: z.string(),
-  name: z.string(),
+  topicName: z.string(),
 });
 
 export default async function handler(
@@ -71,27 +73,33 @@ export default async function handler(
     });
 
   try {
-    // Connecting to redis client
-    client.on("error", (err) => console.log("Redis Client Error", err));
-    await client.connect();
+    const info = await client.clientInfo().catch((error) => {
+      console.log(error.message);
+      return error.message;
+    });
+    console.log("info", info);
+    if (info === "The client is closed") {
+      await client.connect().catch((error) => console.log(error.message));
+      // Creating recall plan in Redis DB
+    }
 
     // Looking for recall plan
     const recall = await recallRepository
       .search()
       .where("userId")
       .eq(`${parsedRequestData.data.userId}`)
-      .and("name")
-      .eq(`${parsedRequestData.data.name}`)
-      .return.first();
+      .and("topicName")
+      .eq(`${parsedRequestData.data.topicName}`)
+
+      .return.all();
     if (!recall) {
       // Deconnecting from redis client
-      await client.disconnect();
+
       console.log(recall);
       return res.json({ message: "No recall in database" });
     }
 
     // Deconnecting from redis client
-    await client.disconnect();
 
     res.json({ msg: "Here are your user recall plan", recall });
   } catch (error) {
