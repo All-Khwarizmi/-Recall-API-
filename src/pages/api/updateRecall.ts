@@ -141,8 +141,7 @@ export default async function handler(
       recallUpdated,
     });
 
-    // Deconnecting from redis client
-    await client.disconnect();
+   
   } catch (error) {
     console.log(error);
     res.status(500).json({

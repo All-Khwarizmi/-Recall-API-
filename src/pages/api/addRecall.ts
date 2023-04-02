@@ -170,8 +170,7 @@ export default async function handler<NextApiHandler>(
       .eq(`${parsedRequestData.data.questionName}`)
       .return.return.all();
     if (isRecallInDB.length) {
-      // Deconnecting from redis client
-      await client.disconnect();
+    
       console.log(isRecallInDB.length);
       console.log("Recall already in DB");
       return res.status(208).json({ message: "Recall already in database" });
@@ -194,6 +193,4 @@ export default async function handler<NextApiHandler>(
     });
   }
 
-  // Deconnecting from redis client
-  await client.disconnect();
 }
