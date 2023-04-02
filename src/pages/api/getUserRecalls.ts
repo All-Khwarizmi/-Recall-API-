@@ -86,7 +86,8 @@ console.log(req.body)
       .return.all();
     console.log(recall);
     if (!recall.length) {
-     
+      // Deconnecting from redis client
+      await client.disconnect();
       return res.json({ message: "No recall in database" });
     }
 

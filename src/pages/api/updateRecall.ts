@@ -60,7 +60,7 @@ export default async function handler(
   await runMiddleware(req, res, cors);
 
   // Rest of the API logic
-
+console.log("Update Recall request body: ", req.body)
   // Checking request method
   if (req.method !== "POST")
     return res.status(400).json({
@@ -78,7 +78,7 @@ export default async function handler(
   requestData.nextRecall = new Date(requestData.nextRecall);
   // console.log("request Data", requestData);
   const parsedRequestData = updateRecallRequestSchema.safeParse(requestData);
-  // console.log(parsedRequestData);
+ console.log(parsedRequestData);
   const parsedRequestDataParse = updateRecallRequestSchema.parse(requestData);
   // console.log(parsedRequestDataParse);
   if (!parsedRequestData.success) {

@@ -21,8 +21,7 @@ const AddRecall: NextPage = () => {
   const [botUrl, setBotUrl] = useState<string>("");
   const newCalendar = useMemo(calendar, []);
 
-  const options = useMemo(() => {
-    return {
+  const options = {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -30,18 +29,24 @@ const AddRecall: NextPage = () => {
       },
       body: JSON.stringify({
         userName,
-        topicName: topic,
+        topicName: topic.trim(),
         botUrl,
+        questionName: `${topic} ${Math.floor(Math.random() * 10002)}`,
+        interval: 1,
+        repetitions: 1,
+        easeFactor: 2.5,
+        quality: 3,
+        score: [80,],
+        studySessions: [new Date()],
         userEmail: session?.user.email,
         userId: session?.user.id,
         userImage: session?.user.image,
         calendar: newCalendar,
         lastRecall: new Date(),
         nextRecallName: "recallOne",
-        nextRecall: new Date(newCalendar.recallOne),
-      }),
-    };
-  }, [botUrl, userName]);
+        nextRecall:  new Date(newCalendar.recallOne),
+      })
+    }
   // Synchronizing userName input with user session data
   useEffect(() => {
     if (status === "loading") {

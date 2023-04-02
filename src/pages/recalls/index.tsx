@@ -9,6 +9,7 @@ import { z } from "zod";
 import { whatRecallDay, getNextRecallDay } from "lib/whatRecallDay";
 import differenceInDays from "date-fns/differenceInDays";
 import { Calendar } from "lib/helpers";
+import { AddRecall } from "../api/addRecall";
 
 // Zod schema 
 const recallsScquema = z.object({
@@ -19,10 +20,15 @@ const recallsScquema = z.object({
       userId: z.string(),
       userEmail: z.string().email(),
       userImage: z.string(),
-      userName: z.string(),
-      lastRecall: z.string(),
-      nextRecall: z.string(),
+      questionName: z.string(),
       nextRecallName: z.string(),
+      nextRecall: z.string(),
+      interval: z.number(),
+      repetitions: z.number(),
+      easeFactor: z.number(),
+      quality: z.number(),
+      score: z.array(z.string()),
+      studySessions: z.array(z.string()),
       calendar: z.object({
         recallOne: z.string(),
         recallTwo: z.string(),
@@ -73,7 +79,7 @@ const Recalls: NextPage = () => {
     } else {
       // "http://localhost:3000/api/getUserRecalls"
       // env.NEXT_PUBLIC_API_GET_USER_RECALLS_ENDPOINT
-      const data = fetch("http://localhost:3000/api/getUserRecalls", options)
+      const data = fetch(env.NEXT_PUBLIC_API_GET_USER_RECALLS_ENDPOINT, options)
         .then((response) => {
           console.log("Response", response);
           return response.json();
@@ -84,7 +90,10 @@ const Recalls: NextPage = () => {
             setIsDataButNotRecall(true);
             setIsRecallInDB(false);
           }
+
           const typedData = recallsScquema.safeParse(data);
+          const typedDatParse = recallsScquema.parse(data);
+          console.log("typedDatParse", typedDatParse);
           if (typedData.success) {
             const safeData = typedData.data;
             setIsError(false);
@@ -122,7 +131,7 @@ const Recalls: NextPage = () => {
     //env.NEXT_PUBLIC_API_DELETE_USER_RECALL_ENDPOINT
     if (isUserSure) {
       console.log("Sure");
-      fetch("http://localhost:3000/api/deleteRecall", options)
+      fetch(env.NEXT_PUBLIC_API_DELETE_USER_RECALL_ENDPOINT, options)
         .then((response) => {
           console.log(response.ok);
           if (response.ok) {
@@ -137,7 +146,8 @@ const Recalls: NextPage = () => {
   const handleUpdate = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent> | any,
     nextRecallName: string,
-    calendar: Calendar
+    calendar: Calendar,
+    questionName: string,
   ) => {
     // configuring the new data to update the recall plan
     const calendarMap = new Map(Object.entries(calendar));
@@ -157,6 +167,14 @@ const Recalls: NextPage = () => {
         topicName: e.target.name,
         nextRecallName: nextRecallNameUpdated,
         nextRecall: nextRecallDayValueUpdated,
+        questionName,
+        interval: 1,
+        repetitions: 1,
+        easeFactor: 2.5,
+        quality: 1,
+        score: ["50"],
+        studySessions: [new Date()],
+        lastRecall: new Date(),
       }),
     };
     // Asking if user has really done the study session
@@ -167,7 +185,7 @@ const Recalls: NextPage = () => {
     if (isUserSure) {
       console.log("Sure");
 
-      fetch("http://localhost:3000/api/updateRecall", options)
+      fetch(env.NEXT_PUBLIC_API_UPDATE_USER_RECALL_ENDPOINT, options)
         .then((response) => {
           console.log(response.ok);
           if (response.ok) {
@@ -175,7 +193,7 @@ const Recalls: NextPage = () => {
           }
         })
         .catch((error) => console.log(error));
-    } 
+    }
   };
 
   const handleHelp = () => {
@@ -258,6 +276,7 @@ const Recalls: NextPage = () => {
           <div className="flex h-full w-full flex-col place-items-center gap-4 px-2 pb-5 md:grid-cols-4 md:gap-5">
             {isRecallInDB &&
               fetchedData.recall.map((recall: any) => {
+                console.log(recall)
                 return (
                   <div
                     key={Math.floor(
@@ -290,7 +309,8 @@ const Recalls: NextPage = () => {
                                 handleUpdate(
                                   e,
                                   recall.nextRecallName,
-                                  recall.calendar
+                                  recall.calendar,
+                                  recall.questionName
                                 )
                               }
                             >

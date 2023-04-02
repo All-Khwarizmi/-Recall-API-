@@ -5,33 +5,7 @@ import { prisma } from "~/server/db";
 import { Schema, Repository } from "redis-om";
 import { z } from "zod";
 import addDays from "date-fns/addDays";
-
-const recallSchema = new Schema("recall", {
-  topicName: { type: "string" },
-  userId: { type: "string" },
-  userEmail: { type: "string" },
-  userImage: { type: "string" },
-  userName: { type: "string" },
-  lastRecall: { type: "date" },
-  nextRecall: { type: "date" },
-  calendar: { type: "string[]" },
-});
-
-export const recallRepository = new Repository(recallSchema, client);
-
-// creating a zod validation schema for recall incoming request
-const addRecallSchema = z.object({
-  topicName: z.string(),
-  userId: z.string(),
-  userEmail: z.string().email(),
-  userImage: z.string(),
-  userName: z.string(),
-  lastRecall: z.date(),
-  nextRecall: z.date(),
-  calendar: z.array(z.string()),
-});
-export type AddRecall = z.infer<typeof addRecallSchema>;
-export type DayDate = Date;
+import { recallRepository } from "./addRecall";
 
 export default async function handler<NextApiHandler>(
   req: NextApiRequest,
@@ -71,7 +45,8 @@ export default async function handler<NextApiHandler>(
 try {
   client.on("error", (err) => console.log("Redis Client Error", err));
   await client.connect();
-  await recallRepository.dropIndex()
+  await recallRepository.remove("01GWHVXA9HJK55BCX1E8DWYMDR");
+//  await recallRepository.dropIndex()
 /*   
   const recall = await recallRepository.save(parsedRequestData.data);
   // const requestKey = req.body;
